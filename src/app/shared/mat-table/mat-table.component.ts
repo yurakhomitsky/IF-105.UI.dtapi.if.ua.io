@@ -1,5 +1,7 @@
 import { Component, OnInit, Input, OnChanges, Output, EventEmitter, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
-import { MatTableDataSource, PageEvent, MatPaginator, MatSort } from '@angular/material';
+import { PageEvent, MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { Column, ActionButtons } from './mat-table.interface';
 import { ApiService } from '../services/api.service';
 import { SpinnerService } from '../spinner/spinner.service';
@@ -30,21 +32,20 @@ export class MatTableComponent implements OnInit, OnChanges, AfterViewInit {
   pageSizeOptions = [5, 10, 20, 50];
   isLoading = false;
 
-  @ViewChild('matPaginator', { static: false }) matPaginator: MatPaginator;
-  @ViewChild(MatSort, { static: false }) sort: MatSort;
-  @ViewChild('search', { static: false }) input: ElementRef;
+  @ViewChild('matPaginator') matPaginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild('search') input: ElementRef;
 
   constructor(private apiService: ApiService, public spinnerService: SpinnerService) {
   }
 
   ngOnChanges(): void {
+    this.dataSource = new MatTableDataSource(this.data);
     if (this.countRecords) {
       this.checkDataLength(this.data);
-      this.dataSource = new MatTableDataSource(this.data);
       this.matPaginator.length = this.countRecords;
       this.dataSource.sort = this.sort;
     } else {
-      this.dataSource = new MatTableDataSource(this.data);
       this.dataSource.paginator = this.matPaginator;
       this.dataSource.sort = this.sort;
     }
@@ -56,6 +57,7 @@ export class MatTableComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    this.dataSource.paginator = this.matPaginator;
     if (this.filter) {
       fromEvent<any>(this.input.nativeElement, 'keyup')
         .pipe(

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Faculty } from 'src/app/shared/entity.interface';
 import { ApiService } from 'src/app/shared/services/api.service';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { CreateEditComponent } from './create-edit/create-edit.component';
 
 
@@ -24,7 +24,7 @@ export class FacultiesService {
     return this.apiService.createEntity('Faculty', faculty);
 
   }
-  updateFaculty(id: number, faculty: Faculty) {
+  updateFaculty(id: number, faculty: any) {
     return this.apiService.updEntity('Faculty', faculty, id);
   }
 

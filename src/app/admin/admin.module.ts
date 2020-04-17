@@ -21,7 +21,7 @@ import { NavbarComponent } from './sidenav/sidenav.component';
 import { CreateEditComponent } from './faculties/create-edit/create-edit.component';
 import { SubjectsComponent } from './subjects/subjects.component';
 import { SubjectsCreateModalComponent } from './subjects/subjects-create-modal/subjects-create-modal.component';
-import { MatDialogModule } from '@angular/material';
+import { MatDialogModule } from '@angular/material/dialog';
 import { TimeTableComponent } from './time-table/time-table.component';
 import { TimeTableAddDialogComponent } from './time-table/time-table-add-dialog/time-table-add-dialog.component';
 import { QuestionTypePipe } from './questions/pipes/question-type.pipe';
@@ -57,6 +57,10 @@ import { AboutUsComponent } from './about-us/about-us.component';
 import { DoughnutChartComponent } from './about-us/doughnut-chart/doughnut-chart.component';
 import { BarsChartComponent } from './about-us/bars-chart/bars-chart.component';
 import { ProtocolComponent } from './protocol/protocol.component';
+import { StoreModule } from '@ngrx/store';
+import { reducers } from './store/MainReducer';
+import { EffectsModule } from '@ngrx/effects';
+import { FacultyEffects } from './store/faculty/faculty-effects';
 
 
 
@@ -228,7 +232,9 @@ const routes: Routes = [
         deps: [HttpClient]
       }
     }),
-    ChartsModule
+    ChartsModule,
+    StoreModule.forFeature('admin',reducers),
+    EffectsModule.forFeature([FacultyEffects])
   ],
   providers: [
     AdminUserService,

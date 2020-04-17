@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpErrorResponse, HttpResponse} from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { environment } from '../environments/environment';
 import { Router } from '@angular/router';
 import { errorMapping, defaultMessage } from '../app/http.interceptor.constants';
@@ -25,7 +25,10 @@ export class ApiHttpInterceptor implements HttpInterceptor {
       .pipe(
         catchError((error: HttpErrorResponse) => {
           const mappedError = errorMapping.find(({status}) => error.status === status);
-          this.openSnackBar(mappedError && this.translate.instant(mappedError.message) || this.translate.instant(defaultMessage), 'X');
+          if ( mappedError && this.translate.instant(mappedError.message) ) {
+            this.openSnackBar(this.translate.instant(mappedError.message) , 'X');
+          }
+          // this.openSnackBar(mappedError && this.translate.instant(mappedError.message) || this.translate.instant(defaultMessage), 'X');
           if (error.status === 401 || error.status === 403) {
             this.router.navigate(['login']);
           }
