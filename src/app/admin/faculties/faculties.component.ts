@@ -8,10 +8,9 @@ import { MatTableComponent } from 'src/app/shared/mat-table/mat-table.component'
 import { Store, select } from '@ngrx/store';
 import { AppState } from 'src/app/reducers';
 import { loadAllFaculties, facultyUpdate, facultyDelete, facultyCreate } from '../store/faculty/faculty-actions';
-import { selectAllFaculties, areFacultiesLoaded } from '../store/faculty/faculty-selectors';
-import { take, tap } from 'rxjs/operators';
-import { selectAll } from '../store/faculty/faculty-reducers';
+import { selectAllFaculties } from '../store/faculty/faculty-selectors';
 import { Observable } from 'rxjs';
+
 
 @Component({
   selector: 'app-faculties',
@@ -55,17 +54,8 @@ export class FacultiesComponent  implements OnInit, AfterViewInit {
     private store: Store<AppState>) {}
 
   ngOnInit(): void {
-    this.store.pipe(
-      select(areFacultiesLoaded),
-      tap((hasLoaded) => {
-        if (!hasLoaded) {
-          this.store.dispatch(loadAllFaculties())
-        }
-      })
-    ).subscribe();
-
-
-   this.faculties$ = this.store.pipe(select(selectAllFaculties))
+    this.store.dispatch(loadAllFaculties());
+    this.faculties$ = this.store.pipe(select(selectAllFaculties))
   }
 
   pageUpdate() {
@@ -102,8 +92,8 @@ export class FacultiesComponent  implements OnInit, AfterViewInit {
 
   createFaculty(faculty: Faculty) {
     this.facultyService.createFaculty(faculty)
-      .subscribe(() => {
-        this.store.dispatch(facultyCreate({create: faculty}));
+      .subscribe(([response]) => {
+        this.store.dispatch(facultyCreate({create: response}));
         // this.mattable.getRange(data => this.faculties = data);
         // this.length++;
         this.openSnackBar('Факультет додано');

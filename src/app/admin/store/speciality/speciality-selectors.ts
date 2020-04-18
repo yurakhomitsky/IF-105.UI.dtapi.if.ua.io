@@ -1,5 +1,6 @@
 import { AdminState } from '../MainReducer';
 import { createFeatureSelector, createSelector } from '@ngrx/store';
+import {selectSpecialities} from './speciality-reducer'
 
 export const selectAdminState = createFeatureSelector<AdminState>('admin');
 
@@ -8,7 +9,12 @@ export const selectSpecialityState = createSelector(
     state => state.speciality
 )
 
-// export const selectSpecialities = createSelector(
-//     selectSpecialityState,
-//     state => state.specialities
-// );
+export const selectAllSpecialities = createSelector(
+    selectSpecialityState,
+    selectSpecialities
+)
+
+export const areSpecialitiesLoaded = createSelector(
+    selectSpecialityState,
+    state => state.allSpecialitiesLoaded
+);
