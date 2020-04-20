@@ -15,3 +15,14 @@ export interface ActionButtons {
     aria_label?: string;
     route?: string;
 }
+
+export interface ActionTable<T> {
+    type: tableActionsType;
+    body: T;
+    route?: string;
+}
+
+export interface PaginationEvent {
+    pageSize: number;
+    offset: number;
+}

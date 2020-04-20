@@ -4,7 +4,7 @@ import { Update } from '@ngrx/entity';
 
 
 export const loadAllSpecialities= createAction(
-    '[Speciality page] Load All Specialities'
+    '[Speciality data] Load All Specialities'
 );
 export const allSpecialitiesLoaded = createAction(
     '[Load Specialities Effect] All Specialities Loaded',
