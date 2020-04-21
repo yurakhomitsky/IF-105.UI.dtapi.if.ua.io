@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { Speciality } from '.././../entity.interface';
 import { ApiService } from '../../../shared/services/api.service';
 import { DialogFormComponent } from '../dialog-form/dialog-form.component';
@@ -9,14 +9,15 @@ import { MatTableDataSource, MatTable } from '@angular/material/table';
 import { ModalService } from '../../../shared/services/modal.service';
 import { Store, select } from '@ngrx/store';
 import { AdminState } from '../../store/MainReducer';
-import { allSpecialitiesLoaded } from '../../store/speciality/speciality-actions';
+import { allSpecialitiesLoaded, loadAllSpecialities, specialityCreate, specialityUpdate, specialityDelete } from '../../store/speciality/speciality-actions';
+import { selectAllSpecialities } from '../../store/speciality/speciality-selectors';
 @Component({
   selector: 'app-speciality-list',
   templateUrl: './speciality-list.component.html',
   styleUrls: ['./speciality-list.component.scss']
 })
 
-export class SpecialityListComponent implements OnInit {
+export class SpecialityListComponent implements OnInit, AfterViewInit {
 
   public displayedColumns: string[] = ['code', 'name', 'buttons'];
   public dataSource = new MatTableDataSource<Speciality>();
@@ -38,10 +39,10 @@ export class SpecialityListComponent implements OnInit {
     this.dataSource.paginator = this.paginator;
   }
   getSpeciality(): any {
-    this.apiService.getEntity('Speciality').subscribe((data: Speciality[]) =>{
-       this.dataSource.data = data;
-      this.store.dispatch(allSpecialitiesLoaded({specialities: data}));
-      });
+    this.store.dispatch(loadAllSpecialities());
+    this.store.pipe(
+      select(selectAllSpecialities)
+    ).subscribe((data: Speciality[]) => this.dataSource.data = data);
   }
 
   openConfirmDialog(speciality: Speciality) {
@@ -51,10 +52,15 @@ export class SpecialityListComponent implements OnInit {
   delSpeciality(obj: Speciality) {
     this.apiService.delEntity('Speciality', obj.speciality_id)
       .subscribe((data) => {
-        this.dataSource.data = this.dataSource.data.filter(speciality => speciality.speciality_id !== obj.speciality_id);
+        this.store.dispatch(specialityDelete({id: obj.speciality_id}));
+        // this.dataSource.data = this.dataSource.data.filter(speciality => speciality.speciality_id !== obj.speciality_id);
         this.openSnackBar('Спеціальність ' + obj.speciality_name + ' була успішно видалена');
-      }, err => {
-        this.openSnackBar(err.error.response);
+      },  err => {
+        if (err.error.response.includes('Cannot delete')) {
+          this.modalService.openInfoModal('Неможливо видалити спеціальність. Потрібно видалити групу цієї спеціальності');
+        } else {
+          this.modalService.openErrorModal('Помилка видалення');
+        }
       });
   }
   addSpeciality() {
@@ -66,8 +72,9 @@ export class SpecialityListComponent implements OnInit {
       if (data) {
         return this.apiService.createEntity('Speciality', data).subscribe((obj: Speciality) => {
           this.openSnackBar('Спеціальність ' + data.speciality_name + ' була успішно створена');
-          this.dataSource.data = [...this.dataSource.data, obj[0]];
-          this.table.renderRows();
+          this.store.dispatch(specialityCreate({create: obj[0]}));
+          // this.dataSource.data = [...this.dataSource.data, obj[0]];
+          // this.table.renderRows();
         }, err => {
           this.openSnackBar(err.error.response);
         }
@@ -86,6 +93,12 @@ export class SpecialityListComponent implements OnInit {
       if (data) {
         data.speciality_id = speciality.speciality_id;
         return this.apiService.updEntity('Speciality', data, speciality.speciality_id).subscribe((specialityObj: Speciality) => {
+          this.store.dispatch(specialityUpdate({
+            update: {
+              id: data.speciality_id,
+              changes: specialityObj
+            }
+          }))
           this.openSnackBar('Спеціальність ' + speciality.speciality_name + ' була успішно відредагована');
           this.getSpeciality();
         }, err => {

@@ -4,7 +4,7 @@ import { createAction, props } from '@ngrx/store';
 import { Faculty } from 'src/app/shared/entity.interface';
 
 export const loadAllFaculties = createAction(
-    '[Faculty page] Load All Faculties'
+    '[Faculty data] Load All Faculties'
 );
 
 export const allFacultiesLoaded = createAction(

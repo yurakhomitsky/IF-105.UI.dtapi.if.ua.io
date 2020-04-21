@@ -2,7 +2,7 @@ import { Component, OnInit, Input, OnChanges, Output, EventEmitter, ViewChild, A
 import { PageEvent, MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { Column, ActionButtons } from './mat-table.interface';
+import { Column, ActionButtons, PaginationEvent } from './mat-table.interface';
 import { ApiService } from '../services/api.service';
 import { SpinnerService } from '../spinner/spinner.service';
 import { debounceTime, distinctUntilChanged, switchMap, map, tap } from 'rxjs/operators';
@@ -23,7 +23,7 @@ export class MatTableComponent implements OnInit, OnChanges, AfterViewInit {
   @Input() countRecords: number;
   @Input() filter: boolean;
   @Output() action: EventEmitter<any> = new EventEmitter<any>();
-  @Output() pageEvent = new EventEmitter<PageEvent>();
+  @Output() pageEvent = new EventEmitter<PaginationEvent>();
 
   dataSource: MatTableDataSource<any>;
   displayedColumns;
@@ -80,7 +80,10 @@ export class MatTableComponent implements OnInit, OnChanges, AfterViewInit {
   onPaginationChange(paginationEvent: PageEvent) {
     this.pageIndex = paginationEvent.pageIndex;
     this.pageSize = paginationEvent.pageSize;
-    this.pageEvent.emit(paginationEvent);
+    this.pageEvent.emit({
+      pageSize: this.pageSize,
+      offset: this.pageIndex * this.pageSize
+    });
   }
   checkDataLength(data: Array<any>) {
     if (!data.length) {
@@ -91,7 +94,7 @@ export class MatTableComponent implements OnInit, OnChanges, AfterViewInit {
   getEvent(action: ActionButtons, obj: any) {
     const { type, route } = action;
     this.action.emit(
-      route ? { type, route, body: obj } : { type, body: obj }
+      route ? { type,  body: obj, route } : { type, body: obj }
     );
 
   }

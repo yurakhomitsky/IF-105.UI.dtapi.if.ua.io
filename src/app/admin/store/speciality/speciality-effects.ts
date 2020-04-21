@@ -1,26 +1,25 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import * as FacultyAction from '../faculty/faculty-actions';
+import * as SpecialityAction from './speciality-actions';
 import { ApiService } from 'src/app/shared/services/api.service';
-import { concatMap, map, catchError, tap, filter, withLatestFrom } from 'rxjs/operators';
-import { EMPTY } from 'rxjs';
+import { concatMap, map, catchError,  tap, filter, withLatestFrom } from 'rxjs/operators';
+import {  EMPTY } from 'rxjs';
 import { ModalService } from 'src/app/shared/services/modal.service';
-import { FacultiesService } from '../../faculties/faculties.service';
 import { Store } from '@ngrx/store';
-import { areFacultiesLoaded } from './faculty-selectors';
 import { AdminState } from '../MainReducer';
+import { areSpecialitiesLoaded } from './speciality-selectors';
 
 @Injectable()
-export class FacultyEffects {
+export class SpecialityEffects {
 
-    loadFaculties$ = createEffect(() => {
+    loadSpecialities$ = createEffect(() => {
         return this.actions$.pipe(
-                ofType(FacultyAction.loadAllFaculties),
-                withLatestFrom(this.store.select(areFacultiesLoaded)),
+                ofType(SpecialityAction.loadAllSpecialities),
+                withLatestFrom(this.store.select(areSpecialitiesLoaded)),
                 filter(([ action, hasLoaded ]) => !hasLoaded),
                 concatMap(() => {
-                   return this.apiService.getEntity('Faculty').pipe(
-                        map(data => FacultyAction.allFacultiesLoaded({ faculties: data })),
+                   return this.apiService.getEntity('Speciality').pipe(
+                        map(data =>SpecialityAction.allSpecialitiesLoaded({ specialities: data })),
                         catchError(() => EMPTY)
                         )}
                     ),
@@ -28,16 +27,16 @@ export class FacultyEffects {
         );
     });
 
-    saveFaculty$ = createEffect(() => {
+    saveSpeciality$ = createEffect(() => {
         return this.actions$.pipe(
-                ofType(FacultyAction.facultyUpdate),
+                ofType(SpecialityAction.specialityUpdate),
                 concatMap((action) =>
-                this.facultyService.updateFaculty(+action.update.id, action.update.changes)
+                this.apiService.updEntity('Speciality',action.update.changes,+action.update.id,)
                     .pipe(
-                        tap(() => this.modalService.openSnackBar('Факультет оновлено')),
+                        tap(() => this.modalService.openSnackBar('Спеціальність оновлено')),
                         catchError((err) => {
                             if (err.error.response.includes('Error when update')) {
-                                this.modalService.openSnackBar('Інформація про факультет не змінювалась');
+                                this.modalService.openSnackBar('Інформація про спеціальність не змінювалась');
                                 return EMPTY;
                             }
 
@@ -50,7 +49,6 @@ export class FacultyEffects {
 
 
     constructor(private actions$: Actions,
-                private facultyService: FacultiesService,
                 private modalService: ModalService,
                 private apiService: ApiService,
                 private store: Store<AdminState>) {

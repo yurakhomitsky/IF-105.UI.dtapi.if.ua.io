@@ -20,12 +20,12 @@ const specialitiesReducer = createReducer(
     // tslint:disable-next-line:max-line-length
     on(SpecialityAction.allSpecialitiesLoaded, (state, action) => adapter.addAll(action.specialities,{...state, allSpecialitiesLoaded: true})),
 
-    // on(FacultyAction.facultyUpdate, (state, action) =>
-    // adapter.updateOne(action.update, state)),
+    on(SpecialityAction.specialityUpdate, (state, action) =>
+    adapter.updateOne(action.update, state)),
 
-    // on(FacultyAction.facultyCreate, (state, action) => adapter.addOne(action.create,state)),
+    on(SpecialityAction.specialityCreate, (state, action) => adapter.addOne(action.create,state)),
 
-    // on(FacultyAction.facultyDelete, (state, action) => adapter.removeOne(action.id,state))
+    on(SpecialityAction.specialityDelete, (state, action) => adapter.removeOne(action.id,state))
 );
 
 
@@ -33,7 +33,7 @@ export function specialityReducer(state: SpecialityState | undefined, action: Ac
     return specialitiesReducer(state, action);
   }
 
-
+  export const { selectAll:selectSpecialities } = adapter.getSelectors();
 
 
 

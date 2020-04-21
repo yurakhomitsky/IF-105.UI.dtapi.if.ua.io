@@ -11,7 +11,22 @@ import { DialogData } from './group-modal.interface';
 import { GroupService } from './group.service';
 import { GroupAddEditDialogComponent } from './group-add-edit-dialog/group-add-edit-dialog.component';
 import { GroupViewDialogComponent } from './group-view-dialog/group-view-dialog.component';
-import { forkJoin } from 'rxjs';
+import { forkJoin, throwError, merge, combineLatest, concat, Observable, pipe, interval } from 'rxjs';
+import { Column, tableActionsType, ActionTable, PaginationEvent } from 'src/app/shared/mat-table/mat-table.interface';
+import { Router } from '@angular/router';
+import { concatMap, mergeAll, take, withLatestFrom, map, first, concatAll, tap, filter } from 'rxjs/operators';
+import { Store, select } from '@ngrx/store';
+import { AdminState } from '../store/MainReducer';
+import { loadGroups, groupUpdate, groupDelete } from '../store/group/group-actions';
+import { loadAllFaculties } from '../store/faculty/faculty-actions';
+import { loadAllSpecialities } from '../store/speciality/speciality-actions';
+import { selectGroups } from '../store/group/group-reducers';
+import { selectAllGroups, readyGroup, selectSpecialitiesGroups } from '../store/group/group-selectors';
+import { selectAllFaculties, areFacultiesLoaded } from '../store/faculty/faculty-selectors';
+import { selectAllSpecialities, areSpecialitiesLoaded } from '../store/speciality/speciality-selectors';
+import { AppState } from 'src/app/reducers';
+
+
 
 
 @Component({
@@ -20,21 +35,33 @@ import { forkJoin } from 'rxjs';
   styleUrls: ['./group.component.scss']
 })
 export class GroupComponent implements OnInit, AfterViewInit {
+
+  columns: Column[] = [
+    { columnDef: 'group_id', header: 'ID' },
+    { columnDef: 'group_name', header: 'Шифр групи' },
+    { columnDef: 'speciality', header: 'Спеціальність' },
+    { columnDef: 'faculty', header: 'Факультет' },
+    {
+      columnDef: 'action', header: 'Дії', actions: [
+        // tslint:disable-next-line:max-line-length
+        { type: tableActionsType.Route, icon: 'supervisor_account', matTooltip: 'Перейти до списку студентів', aria_label: 'supervisor_account', route: 'Students' },
+        { type: tableActionsType.Route, icon: 'score', matTooltip: 'Перейти до результатів тестування', aria_label: 'score', route: 'results' },
+        { type: tableActionsType.Edit, icon: 'edit', matTooltip: 'Редагувати', aria_label: 'edit' },
+        { type: tableActionsType.Remove, icon: 'delete', matTooltip: 'Видалити', aria_label: 'delete' }
+      ]
+    }
+  ];
+
+  groups$: Observable<Group[]>;
   listGroups: Group[] = [];
   listSpeciality: Speciality[] = [];
   listFaculty: Faculty[] = [];
   dataSource = new MatTableDataSource<Group>();
-  displayedColumns: string[] = [
-    'id',
-    'name',
-    'speciality',
-    'faculty',
-  //  'students',
-    'actions'
-  ];
+
   /** properties for pagination */
   itemsCount: number;
   pageSize = 10;
+  offset = 0;
   currentPage = 0;
   /** properties for get group for features */
   isCheckSpeciality = false;
@@ -44,9 +71,7 @@ export class GroupComponent implements OnInit, AfterViewInit {
   @ViewChild('table', { static: true }) table: MatTable<Group>;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
-  applyFilter(filterValue: string) {
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-  }
+
 
   constructor(
     private apiService: ApiService,
@@ -54,45 +79,58 @@ export class GroupComponent implements OnInit, AfterViewInit {
     private modalService: ModalService,
     private snackBar: MatSnackBar,
     private groupModalService: GroupModalService,
-    public groupService: GroupService
-    ) { }
+    public groupService: GroupService,
+    private route: Router,
+    private store: Store<AdminState>
+  ) {
+  }
 
   ngOnInit() {
     this.getCountRecords('group');
-    forkJoin(
-      this.groupService.getListSpeciality(),
-      this.groupService.getListFaculty(),
-      this.groupService.getListGroup(this.pageSize)
-    ).subscribe(([res1, res2, res3]) => {
-      this.listSpeciality = res1;
-      this.listFaculty = res2;
-      this.listGroups = this.groupService.addPropertyToGroup(res3, res1, res2);
-      this.dataSource.data = this.listGroups;
-    }, () => {
-      this.modalService.openErrorModal('Помилка завантаження даних');
-    });
+    this.getListGroups();
+
   }
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
   }
- /** Handler for pagination */
-  onPaginateChange(data: MatPaginator) {
-    this.pageSize = data.pageSize;
-    this.currentPage = data.pageIndex;
-    const offset = this.pageSize * this.currentPage;
-    this.getListGroups(offset);
+
+  getAction(action: ActionTable<Group>) {
+    const actions = {
+      edit: () => {
+        this.openEditGroupDialog(action.body);
+      },
+      remove: () => {
+        this.openConfirmDialog(action.body);
+      },
+      route: () => {
+        this.route.navigate([`admin/group/${action.route}`, action.body.group_id]);
+      },
+      default() {
+        throwError('Error');
+      }
+    };
+    (actions[action.type] || actions.default)();
   }
+  pageUpdate(event: PaginationEvent) {
+    this.pageSize = event.pageSize;
+    this.offset = event.offset;
+    this.getListGroups(event.pageSize,event.offset);
+  }
+
   /** Get part (size page) list of groups */
-  getListGroups(offset: number = 0) {
-    this.groupService.getListGroup(this.pageSize, offset).subscribe((result: Group[]) => {
-      this.isCheckFaculty = false;
-      this.isCheckSpeciality = false;
-      this.dataSource.data = this.groupService.addPropertyToGroup(result, this.listSpeciality, this.listFaculty);
-    }, () => {
-      this.modalService.openErrorModal('Помилка завантаження списку груп');
-    });
+  getListGroups(pageSize: number = 10,offset: number = 0) {
+    this.store.dispatch(loadGroups({
+      pageSize,
+      offset
+    }));
+   this.groupService.combineGroup().subscribe((groups) => {
+     this.listGroups = groups;
+     this.listFaculty = this.groupService.getListFaculty();
+     this.listSpeciality =  this.groupService.getListSpeciality();
+   });
   }
+
   /** Get length all list of groups */
   getCountRecords(entity: string) {
     this.apiService.getCountRecords(entity).subscribe(result => {
@@ -117,8 +155,8 @@ export class GroupComponent implements OnInit, AfterViewInit {
     this.apiService.createEntity('Group', group).subscribe((result: Group[]) => {
       this.openSnackBar(`Групу ${group.group_name} успішно додано`);
       this.getCountRecords('group');
-      const numberOfPages = this.paginator.getNumberOfPages();
-      this.getListGroups( numberOfPages * this.pageSize);
+      // const numberOfPages = this.paginator.getNumberOfPages();
+      this.getListGroups(this.pageSize, this.offset);
     }, (error: any) => {
       if (error.error.response.includes('Duplicate')) {
         this.modalService.openErrorModal(`Група "${group.group_name}" вже існує`);
@@ -135,9 +173,9 @@ export class GroupComponent implements OnInit, AfterViewInit {
   delGroup(group: Group) {
     this.apiService.delEntity('Group', group.group_id).subscribe((result: any) => {
       if (result) {
+        this.store.dispatch(groupDelete({id: group.group_id}));
         this.openSnackBar(`Групу ${group.group_name} успішно виделено`);
         this.getCountRecords('group');
-        this.getListGroups(this.pageSize * this.currentPage);
       }
     }, (error: any) => {
       if (error.error.response.includes('Cannot delete')) {
@@ -164,30 +202,18 @@ export class GroupComponent implements OnInit, AfterViewInit {
 
   /** Method for edit group */
   editGroup(group: Group): void {
-    this.apiService.updEntity('group', group, group.group_id).subscribe((result: Group[]) => {
-      const index: number = result
-        ? this.listGroups.findIndex(
-          gr => gr.group_id === result[0].group_id
-        )
-        : -1;
-      if (index > -1) {
-        this.openSnackBar('Дані успішно оновлено');
-        this.listGroups[index] = result[0];
-        this.dataSource.data = this.listGroups;
+    this.store.dispatch(groupUpdate({
+      update: {
+        id: group.group_id,
+        changes: group
       }
-    }, (error: any) => {
-      if (error.error.response.includes('Error when update')) {
-        this.modalService.openInfoModal('Інформація про групу не змінювалися');
-      } else {
-        this.modalService.openErrorModal('Помилка оновлення');
-      }
-    });
+    }))
   }
 
   /** Open modal window for check speciality */
   openCheckSpecialityDialog() {
     const dialogData = new DialogData();
-    dialogData.listSpeciality = this.listSpeciality;
+    // dialogData.listSpeciality = this.listSpeciality;
     dialogData.description = {
       title: 'Виберіть спеціальність',
       action: 'getGroupsBySpeciality'
@@ -204,7 +230,7 @@ export class GroupComponent implements OnInit, AfterViewInit {
   /** open modal window for check faculty */
   openCheckFacultyDialog() {
     const dialogData = new DialogData();
-    dialogData.listFaculty = this.listFaculty;
+    // dialogData.listFaculty = this.store();
     dialogData.description = {
       title: 'Виберіть факультет/інститут',
       action: 'getGroupsByFaculty'
@@ -222,10 +248,10 @@ export class GroupComponent implements OnInit, AfterViewInit {
   getListGroupsByFeature(action: string, id: number): void {
     this.apiService.getEntityByAction('Group', action, id).subscribe((result: any) => {
       if ('response' in result) {
-        this.dataSource.data = [];
+        this.listGroups = [];
         this.modalService.openInfoModal('Групи відсутні');
       } else {
-        this.dataSource.data = this.groupService.addPropertyToGroup(result, this.listSpeciality, this.listFaculty);
+        this.listGroups = this.groupService.addPropertyToGroup(result, this.listSpeciality, this.listFaculty);
       }
       this.currentPage = 0;
     }, () => {
@@ -241,7 +267,8 @@ export class GroupComponent implements OnInit, AfterViewInit {
 
   backToListGroup() {
     this.currentPage = 0;
-    this.getCountRecords('group');
-    this.getListGroups();
+    this.isCheckFaculty = false;
+    this.isCheckSpeciality = false;
+    this.store.select(readyGroup).subscribe(data => this.listGroups = data);
   }
 }
