@@ -71,9 +71,7 @@ export class GroupComponent implements OnInit, AfterViewInit {
   @ViewChild('table', { static: true }) table: MatTable<Group>;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
-  applyFilter(filterValue: string) {
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-  }
+
 
   constructor(
     private apiService: ApiService,
@@ -269,8 +267,6 @@ export class GroupComponent implements OnInit, AfterViewInit {
 
   backToListGroup() {
     this.currentPage = 0;
-    // this.getCountRecords('group');
-    // this.getListGroups();
     this.isCheckFaculty = false;
     this.isCheckSpeciality = false;
     this.store.select(readyGroup).subscribe(data => this.listGroups = data);
