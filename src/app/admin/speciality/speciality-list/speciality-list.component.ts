@@ -92,20 +92,13 @@ export class SpecialityListComponent implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe((data: Speciality) => {
       if (data) {
         data.speciality_id = speciality.speciality_id;
-        return this.apiService.updEntity('Speciality', data, speciality.speciality_id).subscribe((specialityObj: Speciality) => {
-          this.store.dispatch(specialityUpdate({
-            update: {
-              id: data.speciality_id,
-              changes: specialityObj
-            }
-          }))
-          this.openSnackBar('Спеціальність ' + speciality.speciality_name + ' була успішно відредагована');
-          this.getSpeciality();
-        }, err => {
-          this.openSnackBar(err.error.response);
-        });
+        this.store.dispatch(specialityUpdate({
+          update: {
+            id: data.speciality_id,
+            changes: data
+          }
+        }))
       }
-      this.getSpeciality();
     });
   }
   openSnackBar(message: string, action?: string) {

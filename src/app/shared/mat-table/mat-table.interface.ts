@@ -25,4 +25,5 @@ export interface ActionTable<T> {
 export interface PaginationEvent {
     pageSize: number;
     offset: number;
+    page?: number;
 }

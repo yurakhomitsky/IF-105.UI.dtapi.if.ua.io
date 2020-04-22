@@ -2,38 +2,57 @@ import { Injectable } from '@angular/core';
 import { Speciality, Faculty, Group } from '../../shared/entity.interface';
 import { ApiService } from 'src/app/shared/services/api.service';
 import { ModalService } from '../../shared/services/modal.service';
-import { Observable, of, concat, merge, forkJoin } from 'rxjs';
+import { Observable, of, concat, merge, forkJoin, combineLatest } from 'rxjs';
 import { AppState } from 'src/app/reducers';
 import { Store, select } from '@ngrx/store';
 import { selectAllFaculties, areFacultiesLoaded } from '../store/faculty/faculty-selectors';
 import { selectAllSpecialities, areSpecialitiesLoaded } from '../store/speciality/speciality-selectors';
-import { filter, map, tap, switchMap, share, first } from 'rxjs/operators';
+import { filter, map, tap, switchMap, share, first, withLatestFrom, distinctUntilChanged, concatMap } from 'rxjs/operators';
 import { loadAllFaculties } from '../store/faculty/faculty-actions';
 import { loadAllSpecialities } from '../store/speciality/speciality-actions';
-import { readyGroup, selectAllGroups } from '../store/group/group-selectors';
+import { readyGroup, selectAllGroups, selectLoadingGroups } from '../store/group/group-selectors';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GroupService {
 
- requireFaculty$ =  this.store.select(areFacultiesLoaded).pipe(
-    tap(hasLoaded => {
-      if(!hasLoaded) {
-        this.store.dispatch(loadAllFaculties());
-      }
-    }),
-    first((item) => item)
-  )
+//  requireFaculty$ =  this.store.select(areFacultiesLoaded).pipe(
+//     tap(hasLoaded => {
+//       if(!hasLoaded) {
+//         this.store.dispatch(loadAllFaculties());
+//       }
+//     }),
+//     first((item) => item)
+//   )
 
- requiteSpeciality$ =  this.store.select(areSpecialitiesLoaded).pipe(
-    tap(hasLoaded => {
-      if(!hasLoaded) {
+//  requiteSpeciality$ =  this.store.select(areSpecialitiesLoaded).pipe(
+//     tap(hasLoaded => {
+//       if(!hasLoaded) {
+//         this.store.dispatch(loadAllSpecialities());
+//       }
+//     }),
+//     first((item) => item)
+//   )
+
+
+  getBothEntityLoaded$ = combineLatest(
+    this.store.select(areSpecialitiesLoaded).pipe(tap((hasloaded) => {
+      if(!hasloaded) {
         this.store.dispatch(loadAllSpecialities());
       }
-    }),
-    first((item) => item)
-  )
+    })),
+    this.store.select(areFacultiesLoaded).pipe(tap((hasloaded) => {
+      if(!hasloaded) {
+        this.store.dispatch(loadAllFaculties());
+      }
+    } )),
+    this.store.select(selectLoadingGroups),
+    (speciality, faculty,groups) => {
+      return faculty && speciality && !groups;
+    }
+  ).pipe(first((item) => item));
+
 
   constructor(private apiService: ApiService, private modalService: ModalService, private store: Store<AppState>) { }
 
@@ -41,14 +60,24 @@ export class GroupService {
     return this.apiService.getRecordsRange('group', pageSize, offset);
   }
 
-  // this.store.select(readyGroup).pipe(map((data) => data)))
-  combineGroup() {
-    return forkJoin(this.requireFaculty$,this.requiteSpeciality$).pipe(
-      switchMap(() =>  this.store.pipe(select(readyGroup)),
-        )
+  combineGroup(page?: number,pageSize?:number) {
+      return this.getBothEntityLoaded$.pipe(
+        concatMap((data) =>  {
+         return this.store.pipe(select(readyGroup));
+        }),
+        map((groups) => groups.slice((page - 1) * pageSize, page * pageSize))
       )
   }
+  chunkArray(groups:Group[],page?:number,pageSize?:number) {
+    return groups.slice((page - 1) * pageSize, page * pageSize);
+  }
 
+  getGroups() {
+    return this.getBothEntityLoaded$.pipe(
+      concatMap((data) =>  {
+       return this.store.pipe(select(readyGroup));
+      }))
+  }
 
   getListSpeciality() {
     let specialities: Speciality[];
@@ -116,7 +145,4 @@ export class GroupService {
     });
   }
 
-
-
-  getReadyGroup() { }
 }

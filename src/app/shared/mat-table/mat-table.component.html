@@ -20,8 +20,9 @@
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 </table>
-<div class="loading-shade" *ngIf="dataSource.data.length === 0">
-  <div *ngIf="dataSource.data.length === 0 && !isLoading" class="no-data">Дані відсутні.</div>
+<div class="loading-shade" *ngIf="isLoading">
+  <!-- <div *ngIf="dataSource.data.length === 0" class="no-data">Дані відсутні.</div> -->
+  <mat-progress-spinner   mode="indeterminate" color='warn'></mat-progress-spinner>
 </div>
 </div>
 

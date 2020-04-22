@@ -4,8 +4,9 @@ import { createReducer, on } from '@ngrx/store';
 import GroupAction from './group-types';
 
 
-export interface GroupState extends EntityState<Group> {
 
+export interface GroupState extends EntityState<Group> {
+    loading: boolean;
 }
 
 export const adapter = createEntityAdapter<Group>({
@@ -13,15 +14,16 @@ export const adapter = createEntityAdapter<Group>({
 });
 
 export  const initialGroupsState = adapter.getInitialState({
-
+    loading: false,
 });
 
 export const groupsReducer = createReducer(
     initialGroupsState,
-    on(GroupAction.groupsLoaded, (state, action) => adapter.addAll(action.groups, state) ),
+    on(GroupAction.loadGroups, (state, action) => ({...state, loading: true})),
 
-    on(GroupAction.groupUpdate, (state, action) =>
-    adapter.updateOne(action.update, state)),
+    on(GroupAction.groupsLoaded, (state, action) => adapter.addMany(action.groups, {...state, loading: false})),
+
+    on(GroupAction.groupUpdate, (state, action) => adapter.updateOne(action.update, state)),
 
     on(GroupAction.groupCreate, (state, action) => adapter.addOne(action.create,state)),
 
@@ -29,4 +31,4 @@ export const groupsReducer = createReducer(
 );
 
 
-export const { selectAll:selectGroups } = adapter.getSelectors();
+export const { selectAll:selectGroups, selectTotal:selectGroupsTotal } = adapter.getSelectors();
