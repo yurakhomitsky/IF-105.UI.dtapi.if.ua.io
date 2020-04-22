@@ -11,13 +11,16 @@ import { DialogData } from './group-modal.interface';
 import { GroupService } from './group.service';
 import { GroupAddEditDialogComponent } from './group-add-edit-dialog/group-add-edit-dialog.component';
 import { GroupViewDialogComponent } from './group-view-dialog/group-view-dialog.component';
-import {  throwError, Observable, ReplaySubject,  } from 'rxjs';
+import { throwError, Observable, ReplaySubject, combineLatest, } from 'rxjs';
 import { Column, tableActionsType, ActionTable, PaginationEvent } from 'src/app/shared/mat-table/mat-table.interface';
 import { Router } from '@angular/router';
-import { Store, select,  } from '@ngrx/store';
+import { Store, select, } from '@ngrx/store';
 import { AdminState } from '../store/MainReducer';
 import { loadGroups, groupUpdate, groupDelete, groupCreate } from '../store/group/group-actions';
-import {  readyGroup, selectTotalGroups, } from '../store/group/group-selectors';
+import { readyGroup, selectTotalGroups, } from '../store/group/group-selectors';
+import { distinctUntilChanged, take } from 'rxjs/operators';
+import { selectAllSpecialities } from '../store/speciality/speciality-selectors';
+import { selectAllFaculties } from '../store/faculty/faculty-selectors';
 
 
 
@@ -51,6 +54,7 @@ export class GroupComponent implements OnInit, AfterViewInit {
   groups$: Observable<any> = this.groupService.getGroups();
 
   listGroups = [];
+  listGroupsChunk = [];
   listSpeciality: Speciality[] = [];
   listFaculty: Faculty[] = [];
   dataSource = new MatTableDataSource<Group>();
@@ -65,10 +69,8 @@ export class GroupComponent implements OnInit, AfterViewInit {
   isCheckFaculty = false;
   feature: string;
   total = 0;
-
   @ViewChild('table', { static: true }) table: MatTable<Group>;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-
 
 
   constructor(
@@ -84,19 +86,16 @@ export class GroupComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
+    this.getListEntities();
     this.getCountRecords('group');
-    // this.groups$.subscribe((data) => {
-    //   this.listGroups = data;
-    //   console.log(this.listGroups);
-    //  })
-    this.getListGroups();
-    // this.store.dispatch(loadGroups({
-    //   pageSize: 10,
-    //   offset: 0
-    // }));
-    this.totalGroups$.subscribe((totalGroups) => {
-      this.total = totalGroups;
+    this.arrayVisitedPages.add(this.currentPage);
+    this.dispatchGroups();
+    this.groups$.subscribe((data) => {
+      this.listGroups = data;
+      this.listGroupsChunk = this.chunkArray(this.listGroups, this.currentPage, this.pageSize);
     })
+
+    this.totalGroups$.subscribe((totalGroups) => this.total = totalGroups);
   }
 
   ngAfterViewInit() {
@@ -123,47 +122,56 @@ export class GroupComponent implements OnInit, AfterViewInit {
   pageUpdate(event: PaginationEvent) {
     this.pageSize = event.pageSize;
     this.offset = event.offset;
-    this.getListGroups(event.pageSize,event.offset,event.page);
-  }
-
-  /** Get part (size page) list of groups */
-  getListGroups(pageSize: number = 10,offset: number = 0,page: number = 0) {
-    let newpage = page === 0 ? 1 : page ;
-    if (page=== 0) {
-      newpage = 1;
-    } else if(newpage === page) {
-       newpage++;
+    this.currentPage = event.page;
+    if (this.checkVisitedPages(event.page)) {
+      this.arrayVisitedPages.add(event.page);
+      this.dispatchGroups(event.pageSize,event.offset);
     } else {
-      newpage--;
+      this.listGroupsChunk = this.chunkArray(this.listGroups, event.page, event.pageSize);
     }
-    console.log('Total: ',this.total,'ItemsCounts: ',this.itemsCount);
-    if(![...this.arrayVisitedPages].includes(page) && !(this.total === this.itemsCount) || !(this.total === this.itemsCount)) {
-      console.log('Im here');
-      this.arrayVisitedPages.add(page);
-      this.store.dispatch(loadGroups({
-        pageSize,
-        offset
-      }));
+    if(this.chunkArray(this.listGroups, event.page, event.pageSize).length !== 0) {
+      this.listGroupsChunk = this.chunkArray(this.listGroups, event.page, event.pageSize);
     }
-
-
-    // this.listGroups = this.groupService.chunkArray(this.listGroups,newpage,pageSize);
-    // console.log(this.listGroups);
-    // this.listFaculty = this.groupService.getListFaculty();
-    // this.listSpeciality =  this.groupService.getListSpeciality();
-    this.groupService.combineGroup(newpage,pageSize).subscribe((groups) => {
-    console.log('How many times here');
-     this.listGroups = groups;
-     this.listFaculty = this.groupService.getListFaculty();
-     this.listSpeciality =  this.groupService.getListSpeciality();
-   });
   }
+
 
   /** Get length all list of groups */
   getCountRecords(entity: string) {
     this.apiService.getCountRecords(entity).subscribe(result => {
       this.itemsCount = result.numberOfRecords;
     });
+  }
+
+  checkVisitedPages(page: number, pageSize?: number) {
+    return (![...this.arrayVisitedPages].includes(page) && !(this.total === this.itemsCount))
+  }
+  dispatchGroups(pageSize: number = 10, offset: number = 0): void {
+    this.store.dispatch(loadGroups({
+      pageSize,
+      offset
+    }));
+  }
+  chunkArray(groups: Group[], page: number, pageSize: number) {
+    let newpage = page === 0 ? 1 : page;
+    if (page === 0) {
+      newpage = 1;
+    } else if (newpage === page) {
+      newpage++;
+    } else {
+      newpage--;
+    }
+    return this.groupService.chunkArray(groups, newpage, pageSize);
+  }
+
+  getListEntities() {
+    combineLatest(
+      this.store.select(selectAllFaculties),
+      this.store.select(selectAllSpecialities),
+      (faculty,speciality) => [faculty,speciality]
+    ).subscribe(([faculty,speciality]: [[],[]]) => {
+      this.listSpeciality = speciality;
+      this.listFaculty = faculty;
+    })
   }
 
   /** Open modal window for add new group */
@@ -183,9 +191,7 @@ export class GroupComponent implements OnInit, AfterViewInit {
     this.apiService.createEntity('Group', group).subscribe(([result]) => {
       this.openSnackBar(`Групу ${group.group_name} успішно додано`);
       this.getCountRecords('group');
-      // const numberOfPages = this.paginator.getNumberOfPages();
-      // this.getListGroups(this.pageSize, this.offset);
-      this.store.dispatch(groupCreate({create: result}));
+      this.store.dispatch(groupCreate({ create: result }));
     }, (error: any) => {
       if (error.error.response.includes('Duplicate')) {
         this.modalService.openErrorModal(`Група "${group.group_name}" вже існує`);
@@ -202,7 +208,7 @@ export class GroupComponent implements OnInit, AfterViewInit {
   delGroup(group: Group) {
     this.apiService.delEntity('Group', group.group_id).subscribe((result: any) => {
       if (result) {
-        this.store.dispatch(groupDelete({id: group.group_id}));
+        this.store.dispatch(groupDelete({ id: group.group_id }));
         this.openSnackBar(`Групу ${group.group_name} успішно виделено`);
         this.getCountRecords('group');
       }
@@ -277,10 +283,10 @@ export class GroupComponent implements OnInit, AfterViewInit {
   getListGroupsByFeature(action: string, id: number): void {
     this.apiService.getEntityByAction('Group', action, id).subscribe((result: any) => {
       if ('response' in result) {
-        this.listGroups = [];
+        this.listGroupsChunk = [];
         this.modalService.openInfoModal('Групи відсутні');
       } else {
-        this.listGroups = this.groupService.addPropertyToGroup(result, this.listSpeciality, this.listFaculty);
+        this.listGroupsChunk = this.groupService.addPropertyToGroup(result, this.listSpeciality, this.listFaculty);
       }
       this.currentPage = 0;
     }, () => {
@@ -298,6 +304,6 @@ export class GroupComponent implements OnInit, AfterViewInit {
     this.currentPage = 0;
     this.isCheckFaculty = false;
     this.isCheckSpeciality = false;
-    this.store.select(readyGroup).subscribe(data => this.listGroups = data);
+    this.listGroupsChunk = this.chunkArray(this.listGroups,this.currentPage,this.pageSize);
   }
 }

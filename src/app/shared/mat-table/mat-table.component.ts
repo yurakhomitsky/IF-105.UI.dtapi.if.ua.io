@@ -40,6 +40,12 @@ export class MatTableComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if(changes.data) {
+        this.isLoading = false;
+        console.log(changes.data);
+    } else {
+      this.isLoading = false;
+    }
     this.dataSource = new MatTableDataSource(this.data);
     if (this.countRecords) {
       // this.checkDataLength(this.data);
@@ -49,14 +55,9 @@ export class MatTableComponent implements OnInit, OnChanges, AfterViewInit {
       this.dataSource.paginator = this.matPaginator;
       this.dataSource.sort = this.sort;
     }
-    if(changes.data) {
-      this.isLoading = false;
-    }
+
 
   }
-  private log(msg: string) {
-    console.log(msg);
-}
   ngOnInit() {
     this.displayedColumns = this.columns.map(item => item.columnDef);
   }
@@ -84,7 +85,7 @@ export class MatTableComponent implements OnInit, OnChanges, AfterViewInit {
   }
   onPaginationChange(paginationEvent: PageEvent) {
     this.countRecords ? this.isLoading = true : this.isLoading = false;
-
+    console.log('Pagination',this.isLoading);
     this.pageIndex = paginationEvent.pageIndex;
     this.pageSize = paginationEvent.pageSize;
     this.pageEvent.emit({

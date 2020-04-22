@@ -51,7 +51,7 @@ export class GroupService {
     (speciality, faculty,groups) => {
       return faculty && speciality && !groups;
     }
-  ).pipe(first((item) => item));
+  ).pipe(first((hasloaded) => hasloaded))
 
 
   constructor(private apiService: ApiService, private modalService: ModalService, private store: Store<AppState>) { }
@@ -69,6 +69,9 @@ export class GroupService {
       )
   }
   chunkArray(groups:Group[],page?:number,pageSize?:number) {
+    // if((groups.slice((page - 1) * pageSize, page * pageSize).length === 0)) {
+    //   return groups;
+    // }
     return groups.slice((page - 1) * pageSize, page * pageSize);
   }
 
@@ -80,12 +83,9 @@ export class GroupService {
   }
 
   getListSpeciality() {
-    let specialities: Speciality[];
-    this.store.pipe(
-      select(selectAllSpecialities),
-    )
-      .subscribe(data => specialities = data);
-    return specialities;
+    return this.store.select(selectAllSpecialities)
+    //   .subscribe(data => specialities = data);
+    // return specialities;
   }
 
   getNameSpeciality(id: number, list: Speciality[]): string {
@@ -94,12 +94,9 @@ export class GroupService {
   }
 
   getListFaculty() {
-    let faculties: Faculty[];
-    this.store.pipe(
-      select(selectAllFaculties),
-    )
-      .subscribe(data => faculties = data);
-    return faculties;
+    return  this.store.select(selectAllFaculties)
+    //   .subscribe(data => faculties = data);
+    // return faculties;
   }
 
   getIdsEntity(groups: Group[]) {
