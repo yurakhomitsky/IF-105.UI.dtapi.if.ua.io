@@ -5,7 +5,6 @@
   <button
   mat-stroked-button
   class="btn" (click)='openFacultyModal()'>
-    <mat-icon aria-hidden="false" aria-label="add">add</mat-icon>
     Додати факультет</button>
 </section>
 
@@ -14,7 +13,6 @@
 <app-mat-table 
 [data]="faculties$ | async" 
 [columns]="columns"  
-[countRecords]="length"
 [filter]='true'
 [entity]="'Faculty'"
 (action)='getAction($event)' 

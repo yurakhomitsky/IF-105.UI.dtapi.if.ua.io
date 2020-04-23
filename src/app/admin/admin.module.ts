@@ -61,9 +61,10 @@ import { StoreModule } from '@ngrx/store';
 import { reducers } from './store/MainReducer';
 import { EffectsModule } from '@ngrx/effects';
 import { FacultyEffects } from './store/faculty/faculty-effects';
-import { StoreService } from './store/store.service';
 import { SpecialityEffects } from './store/speciality/speciality-effects';
 import { GroupEffects } from './store/group/group-effects';
+import { StudentEffects } from './store/student/student-effects';
+import { SubjectEffects } from './store/subject/subject-effects';
 
 
 
@@ -237,7 +238,7 @@ const routes: Routes = [
     }),
     ChartsModule,
     StoreModule.forFeature('admin',reducers),
-    EffectsModule.forFeature([FacultyEffects, SpecialityEffects,GroupEffects])
+    EffectsModule.forFeature([FacultyEffects, SpecialityEffects,GroupEffects, StudentEffects,SubjectEffects])
   ],
   providers: [
     AdminUserService,
@@ -247,7 +248,6 @@ const routes: Routes = [
     GroupModalService,
     GroupService,
     AboutUsService,
-    StoreService
   ],
   exports: [
     TimeTablePipe,

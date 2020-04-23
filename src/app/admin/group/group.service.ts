@@ -17,25 +17,6 @@ import { readyGroup, selectAllGroups, selectLoadingGroups } from '../store/group
 })
 export class GroupService {
 
-//  requireFaculty$ =  this.store.select(areFacultiesLoaded).pipe(
-//     tap(hasLoaded => {
-//       if(!hasLoaded) {
-//         this.store.dispatch(loadAllFaculties());
-//       }
-//     }),
-//     first((item) => item)
-//   )
-
-//  requiteSpeciality$ =  this.store.select(areSpecialitiesLoaded).pipe(
-//     tap(hasLoaded => {
-//       if(!hasLoaded) {
-//         this.store.dispatch(loadAllSpecialities());
-//       }
-//     }),
-//     first((item) => item)
-//   )
-
-
   getBothEntityLoaded$ = combineLatest(
     this.store.select(areSpecialitiesLoaded).pipe(tap((hasloaded) => {
       if(!hasloaded) {
@@ -51,7 +32,9 @@ export class GroupService {
     (speciality, faculty,groups) => {
       return faculty && speciality && !groups;
     }
-  ).pipe(first((hasloaded) => hasloaded))
+  ).pipe(
+    filter((hasLoaded) => hasLoaded)
+  )
 
 
   constructor(private apiService: ApiService, private modalService: ModalService, private store: Store<AppState>) { }
@@ -69,23 +52,19 @@ export class GroupService {
       )
   }
   chunkArray(groups:Group[],page?:number,pageSize?:number) {
-    // if((groups.slice((page - 1) * pageSize, page * pageSize).length === 0)) {
-    //   return groups;
-    // }
-    return groups.slice((page - 1) * pageSize, page * pageSize);
+    return groups.slice((page -1) * pageSize, page * pageSize);
   }
 
   getGroups() {
     return this.getBothEntityLoaded$.pipe(
       concatMap((data) =>  {
        return this.store.pipe(select(readyGroup));
-      }))
+      }),
+      )
   }
 
   getListSpeciality() {
     return this.store.select(selectAllSpecialities)
-    //   .subscribe(data => specialities = data);
-    // return specialities;
   }
 
   getNameSpeciality(id: number, list: Speciality[]): string {
@@ -95,8 +74,6 @@ export class GroupService {
 
   getListFaculty() {
     return  this.store.select(selectAllFaculties)
-    //   .subscribe(data => faculties = data);
-    // return faculties;
   }
 
   getIdsEntity(groups: Group[]) {

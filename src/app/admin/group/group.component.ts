@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { Group, Speciality, Faculty } from '../../shared/entity.interface';
 import { MatTableDataSource, MatTable } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -11,14 +11,14 @@ import { DialogData } from './group-modal.interface';
 import { GroupService } from './group.service';
 import { GroupAddEditDialogComponent } from './group-add-edit-dialog/group-add-edit-dialog.component';
 import { GroupViewDialogComponent } from './group-view-dialog/group-view-dialog.component';
-import { throwError, Observable, ReplaySubject, combineLatest, } from 'rxjs';
+import { throwError, Observable, ReplaySubject, combineLatest, Subject, } from 'rxjs';
 import { Column, tableActionsType, ActionTable, PaginationEvent } from 'src/app/shared/mat-table/mat-table.interface';
 import { Router } from '@angular/router';
 import { Store, select, } from '@ngrx/store';
 import { AdminState } from '../store/MainReducer';
 import { loadGroups, groupUpdate, groupDelete, groupCreate } from '../store/group/group-actions';
 import { readyGroup, selectTotalGroups, } from '../store/group/group-selectors';
-import { distinctUntilChanged, take } from 'rxjs/operators';
+import { distinctUntilChanged, take, takeUntil, tap } from 'rxjs/operators';
 import { selectAllSpecialities } from '../store/speciality/speciality-selectors';
 import { selectAllFaculties } from '../store/faculty/faculty-selectors';
 
@@ -31,8 +31,9 @@ import { selectAllFaculties } from '../store/faculty/faculty-selectors';
   templateUrl: './group.component.html',
   styleUrls: ['./group.component.scss']
 })
-export class GroupComponent implements OnInit, AfterViewInit {
+export class GroupComponent implements OnInit, AfterViewInit, OnDestroy {
   arrayVisitedPages = new Set();
+  visitedOffsets = new Set();
 
   columns: Column[] = [
     { columnDef: 'group_id', header: 'ID' },
@@ -51,8 +52,8 @@ export class GroupComponent implements OnInit, AfterViewInit {
   ];
 
   totalGroups$: Observable<number> = this.store.pipe(select(selectTotalGroups));
-  groups$: Observable<any> = this.groupService.getGroups();
-
+  
+  private unsubscribe = new Subject<void>();
   listGroups = [];
   listGroupsChunk = [];
   listSpeciality: Speciality[] = [];
@@ -88,11 +89,15 @@ export class GroupComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.getListEntities();
     this.getCountRecords('group');
+    this.visitedOffsets.add(this.validatePage(this.currentPage) * this.pageSize);
     this.arrayVisitedPages.add(this.currentPage);
     this.dispatchGroups();
-    this.groups$.subscribe((data) => {
+    this.groupService.getGroups()
+      .pipe(
+        takeUntil(this.unsubscribe)
+      ).subscribe((data) => {
       this.listGroups = data;
-      this.listGroupsChunk = this.chunkArray(this.listGroups, this.currentPage, this.pageSize);
+      this.listGroupsChunk = [...this.chunkArray(this.listGroups, this.currentPage, this.pageSize)];
     })
 
     this.totalGroups$.subscribe((totalGroups) => this.total = totalGroups);
@@ -100,6 +105,10 @@ export class GroupComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
+  }
+  ngOnDestroy() {
+    this.unsubscribe.next();
+    this.unsubscribe.complete();
   }
 
   getAction(action: ActionTable<Group>) {
@@ -123,15 +132,16 @@ export class GroupComponent implements OnInit, AfterViewInit {
     this.pageSize = event.pageSize;
     this.offset = event.offset;
     this.currentPage = event.page;
-    if (this.checkVisitedPages(event.page)) {
+    if (this.checkVisitedOffset(this.validatePage(event.page) * event.pageSize, event.page)) {
       this.arrayVisitedPages.add(event.page);
+      this.visitedOffsets.add(this.validatePage(event.page) * event.pageSize);
       this.dispatchGroups(event.pageSize,event.offset);
     } else {
-      this.listGroupsChunk = this.chunkArray(this.listGroups, event.page, event.pageSize);
+      this.listGroupsChunk = [...this.chunkArray(this.listGroups, event.page, event.pageSize)];
     }
-    if(this.chunkArray(this.listGroups, event.page, event.pageSize).length !== 0) {
-      this.listGroupsChunk = this.chunkArray(this.listGroups, event.page, event.pageSize);
-    }
+    // if(this.chunkArray(this.listGroups, event.page, event.pageSize).length !== 0) {
+    //   this.listGroupsChunk = this.chunkArray(this.listGroups, event.page, event.pageSize);
+    // }
   }
 
 
@@ -141,7 +151,9 @@ export class GroupComponent implements OnInit, AfterViewInit {
       this.itemsCount = result.numberOfRecords;
     });
   }
-
+  checkVisitedOffset(offset: number,page: number) {
+    return (![...this.visitedOffsets].includes(offset) && !(this.total === this.itemsCount) && ![...this.arrayVisitedPages].includes(page))
+  }
   checkVisitedPages(page: number, pageSize?: number) {
     return (![...this.arrayVisitedPages].includes(page) && !(this.total === this.itemsCount))
   }
@@ -151,16 +163,20 @@ export class GroupComponent implements OnInit, AfterViewInit {
       offset
     }));
   }
-  chunkArray(groups: Group[], page: number, pageSize: number) {
+
+  validatePage(page:number) {
     let newpage = page === 0 ? 1 : page;
     if (page === 0) {
       newpage = 1;
     } else if (newpage === page) {
-      newpage++;
+      newpage+= 1
     } else {
-      newpage--;
+      newpage-=1;
     }
-    return this.groupService.chunkArray(groups, newpage, pageSize);
+    return  newpage
+  }
+  chunkArray(groups: Group[], page: number, pageSize: number) {
+    return this.groupService.chunkArray(groups, this.validatePage(page), pageSize);
   }
 
   getListEntities() {
