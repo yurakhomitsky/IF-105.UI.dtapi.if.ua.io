@@ -8,6 +8,10 @@ import { map } from 'rxjs/operators';
 import { ResponseInterface } from 'src/app/shared/entity.interface';
 import { ImageCroppedEvent } from 'ngx-image-cropper';
 import { defaultImage } from 'src/app/shared/default-image/default-image';
+import { AdminState } from '../../store/MainReducer';
+import { Store } from '@ngrx/store';
+import { studentCreate, studentUpdate } from '../../store/student/student-actions';
+import { identifierModuleUrl } from '@angular/compiler';
 
 
 @Component({
@@ -66,6 +70,7 @@ export class StudentsModalWindowComponent implements OnInit {
     private studentsHttpService: StudentsService,
     private apiService: ApiService,
     public dialogRef: MatDialogRef<StudentsModalWindowComponent>,
+    private store: Store<AdminState>
   ) { }
 
   ngOnInit() {
@@ -90,12 +95,24 @@ export class StudentsModalWindowComponent implements OnInit {
     };
     if (this.data.updateStudent === true) {
         this.apiService.updEntity('Student', studentDATA, this.data.student_data.user_id).subscribe(
-          (data: ResponseInterface) => this.dialogRef.close(data),
+          (data: ResponseInterface) => {
+            this.store.dispatch(studentUpdate({
+              update: {
+                id: this.data.student_data.user_id,
+                changes: studentDATA
+              }
+            }))
+            this.dialogRef.close(data)
+          },
           error => this.dialogRef.close(error)
       ); return;
     } else {
         this.apiService.createEntity('Student', studentDATA).subscribe(
-          (data) => this.dialogRef.close(data),
+          (data) => {
+            // tslint:disable-next-line:variable-name
+            const { id:user_id} = data;
+            this.store.dispatch(studentCreate({create: {user_id, ...studentDATA}}))
+            this.dialogRef.close(data)},
           error => this.dialogRef.close(error)
     );
     }

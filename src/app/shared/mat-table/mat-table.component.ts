@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnChanges, Output, EventEmitter, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, Output, EventEmitter, ViewChild, AfterViewInit, ElementRef, SimpleChanges } from '@angular/core';
 import { PageEvent, MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -22,6 +22,7 @@ export class MatTableComponent implements OnInit, OnChanges, AfterViewInit {
   @Input() columns: Column[];
   @Input() countRecords: number;
   @Input() filter: boolean;
+  @Input() needPagination = true;
   @Output() action: EventEmitter<any> = new EventEmitter<any>();
   @Output() pageEvent = new EventEmitter<PaginationEvent>();
 
@@ -39,19 +40,24 @@ export class MatTableComponent implements OnInit, OnChanges, AfterViewInit {
   constructor(private apiService: ApiService, public spinnerService: SpinnerService) {
   }
 
-  ngOnChanges(): void {
+  ngOnChanges(changes: SimpleChanges): void {
+    if(changes.data) {
+        this.isLoading = false;
+    } else {
+      this.isLoading = false;
+    }
+    this.isLoading = false;
     this.dataSource = new MatTableDataSource(this.data);
     if (this.countRecords) {
-      this.checkDataLength(this.data);
+      // this.checkDataLength(this.data);
       this.matPaginator.length = this.countRecords;
       this.dataSource.sort = this.sort;
     } else {
       this.dataSource.paginator = this.matPaginator;
       this.dataSource.sort = this.sort;
-    }
-
   }
 
+  }
   ngOnInit() {
     this.displayedColumns = this.columns.map(item => item.columnDef);
   }
@@ -78,11 +84,13 @@ export class MatTableComponent implements OnInit, OnChanges, AfterViewInit {
     return str.trim() && !this.data.find(item => JSON.stringify(item).includes(str));
   }
   onPaginationChange(paginationEvent: PageEvent) {
+    this.countRecords ? this.isLoading = true : this.isLoading = false;
     this.pageIndex = paginationEvent.pageIndex;
     this.pageSize = paginationEvent.pageSize;
     this.pageEvent.emit({
       pageSize: this.pageSize,
-      offset: this.pageIndex * this.pageSize
+      offset: this.pageIndex * this.pageSize,
+      page: this.pageIndex,
     });
   }
   checkDataLength(data: Array<any>) {

@@ -1,6 +1,6 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { AdminState } from '../MainReducer';
-import { selectGroups} from './group-reducers';
+import { selectGroups, selectGroupsTotal} from './group-reducers';
 import { selectAllFaculties } from '../faculty/faculty-selectors';
 import { selectAllSpecialities } from '../speciality/speciality-selectors';
 import { Group } from 'src/app/shared/entity.interface';
@@ -47,6 +47,11 @@ export const selectSpecialitiesGroups = createSelector(
     }
 )
 
+export const selectLoadingGroups = createSelector(
+    selectGroupState,
+    state => state.loading
+);
+
 export const readyGroup = createSelector(
     selectAllGroups,
     selectFacultiesGroups,
@@ -61,3 +66,8 @@ export const readyGroup = createSelector(
           });
     }
 )
+
+export const selectTotalGroups = createSelector(
+    selectGroupState,
+    selectGroupsTotal
+);

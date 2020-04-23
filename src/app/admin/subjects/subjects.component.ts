@@ -1,31 +1,53 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSort } from '@angular/material/sort';
 import { SubjectsCreateModalComponent } from './subjects-create-modal/subjects-create-modal.component';
-import { Subject } from 'src/app/admin/entity.interface';
-import { mergeMap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { Subject as SubjectInterface }  from 'src/app/admin/entity.interface';
+import { mergeMap, filter, concatMap, tap, take, first, takeUntil } from 'rxjs/operators';
+import { of, throwError, Observable, Subject, BehaviorSubject,} from 'rxjs';
 import { MatTableDataSource } from '@angular/material/table';
 import { ApiService } from 'src/app/shared/services/api.service';
 import { Router } from '@angular/router';
 import { ModalService } from 'src/app/shared/services/modal.service';
 import { TranslateService } from '@ngx-translate/core';
+import { AdminState } from '../store/MainReducer';
+import { Store, select } from '@ngrx/store';
+import { Column, tableActionsType, ActionTable } from 'src/app/shared/mat-table/mat-table.interface';
+import { areSubjectsLoaded, selectAllSubject } from '../store/subject/subject-selectors';
+import { loadSubjects, subjectCreate, subjectUpdate, subjectDelete } from '../store/subject/subject-actions';
+
 
 @Component({
   selector: 'app-subjects',
   templateUrl: './subjects.component.html',
   styleUrls: ['./subjects.component.scss'],
 })
-export class SubjectsComponent implements OnInit {
+export class SubjectsComponent implements OnInit, OnDestroy {
 
   public displayedColumns: string[] = ['subject_number', /*'subject_id',*/ 'subject_name', 'subject_description', 'subject_menu'];
-  public dataSource = new MatTableDataSource<Subject>();
+  public dataSource = new MatTableDataSource<SubjectInterface>();
+  subjects$: Observable<SubjectInterface[]>;
+  private unsubscribe = new Subject<void>();
 
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
-
+  columns: Column[] = [
+    { columnDef: 'subject_id', header: 'ID' },
+    { columnDef: 'subject_name', header: 'Предмет' },
+    { columnDef: 'subject_description', header: 'Опис' },
+    {
+      columnDef: 'action', header: 'Дії', actions: [
+        // tslint:disable-next-line:max-line-length
+        { type: tableActionsType.Route, icon: 'assignment_turned_in', matTooltip: 'Тести предмета', aria_label: 'assignment_turned_in', route: 'tests' },
+        // tslint:disable-next-line:max-line-length
+        { type: tableActionsType.Route, icon: 'date_range', matTooltip: 'Розклад тестування', aria_label: 'date_range', route: 'timetable' },
+        { type: tableActionsType.Edit, icon: 'edit', matTooltip: 'Редагувати', aria_label: 'edit' },
+        { type: tableActionsType.Remove, icon: 'delete', matTooltip: 'Видалити', aria_label: 'delete' }
+      ]
+    }
+  ];
   constructor(
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
@@ -33,24 +55,50 @@ export class SubjectsComponent implements OnInit {
     private route: Router,
     private modalService: ModalService,
     private translate: TranslateService,
+    private store: Store<AdminState>
   ) { }
 
   ngOnInit(): void {
-    this.showSubjects();
+    this.showSubjects().pipe(takeUntil(this.unsubscribe)).subscribe();
+    this.subjects$ = this.store.pipe(select(selectAllSubject))
+
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
-
-  applyFilter(filterValue: string) {
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-  }
+  ngOnDestroy() {
+    this.unsubscribe.next();
+    this.unsubscribe.complete();
+   }
 
   showSubjects() {
-    this.apiService.getEntity('Subject')
-      .subscribe(response => {
-        this.dataSource.data = response;
-      });
+    return this.store.pipe(
+      select(areSubjectsLoaded),
+      tap((hasLoaded) => {
+        if (!hasLoaded) {
+          this.store.dispatch(loadSubjects())
+        }
+      }),
+      first((hasLoaded) => hasLoaded))
   }
+  getAction(action: ActionTable<SubjectInterface>) {
+    const { body: { subject_id }, body } = action;
+    const actions = {
+      edit: () => {
+        this.edit(body);
+      },
+      remove: () => {
+        this.openDialog(body);
+      },
+      route: () => {
+        action.route === 'tests' ? this.navigateToTests(subject_id) : this.navigateToTimeTable(subject_id);
+      },
+      default() {
+        throwError('Error');
+      }
+    };
+    (actions[action.type] || actions.default)();
+  }
+  pageUpdate(ev) { }
 
   openSnackBar(message: string, action?: string) {
     this.snackBar.open(message, action, {
@@ -75,15 +123,16 @@ export class SubjectsComponent implements OnInit {
           return of(null);
         })
       )
-      .subscribe((newData: Subject[] | null) => {
+      .subscribe((newData: SubjectInterface | null) => {
         if (newData) {
-          this.dataSource.data = [...this.dataSource.data, newData[0]];
+          this.store.dispatch(subjectCreate({create: newData[0]}))
+          // this.dataSource.data = [...this.dataSource.data, newData[0]];
           this.translateSnackBar('subjects.snackbarMessageCreate', 'X');
         }
       });
   }
 
-  edit(row: Subject): void {
+  edit(row: SubjectInterface): void {
     const newDialogSubject = this.dialog.open(SubjectsCreateModalComponent, {
       width: '530px',
       data: row,
@@ -97,15 +146,22 @@ export class SubjectsComponent implements OnInit {
           return of(null);
         })
       )
-      .subscribe((newData: Subject[] | null) => {
+      .subscribe((newData: SubjectInterface[] | null) => {
+        const [subject] = newData;
+        const {subject_id, ...body} = subject;
         if (newData) {
-          this.showSubjects();
+          this.store.dispatch(subjectUpdate({
+            update: {
+              id: subject_id,
+              changes: body
+            }
+          }))
           this.translateSnackBar('subjects.snackbarMessageEdit', 'X');
         }
       });
   }
 
-  openDialog(subject: Subject) {
+  openDialog(subject: SubjectInterface) {
     const firstPart = this.translate.instant('subjects.deleteMessagesConfirmation');
     const message = firstPart + subject.subject_name + `' ?`;
     this.modalService.openConfirmModal(message, () => this.delSubject(subject.subject_id));
@@ -114,7 +170,7 @@ export class SubjectsComponent implements OnInit {
   delSubject(id: number) {
     this.apiService.delEntity('Subject', id)
       .subscribe((response) => {
-        this.dataSource.data = this.dataSource.data.filter(item => item.subject_id !== id);
+        this.store.dispatch(subjectDelete({id}));
         this.translateSnackBar('subjects.snackbarMessageDelete', 'X');
       });
   }

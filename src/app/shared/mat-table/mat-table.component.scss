@@ -74,3 +74,8 @@ table {
   position: absolute;
   min-height: 200px;
 }
+
+
+tr:not([mat-header-row]):hover {
+  background: whitesmoke;
+}

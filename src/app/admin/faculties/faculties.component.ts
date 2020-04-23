@@ -58,15 +58,9 @@ export class FacultiesComponent  implements OnInit, AfterViewInit {
     this.faculties$ = this.store.pipe(select(selectAllFaculties))
   }
 
-  pageUpdate() {
-    // this.mattable.getRange((data: Faculty[]) => this.faculties = data);
-    // this.mattable.getCountRecords(response => this.length = response.numberOfRecords);
-  }
+  pageUpdate() {}
 
-  ngAfterViewInit(): void {
-    // this.mattable.getRange((data: Faculty[]) => this.faculties = data);
-    // this.mattable.getCountRecords(response => this.length = response.numberOfRecords);
-  }
+  ngAfterViewInit(): void {}
 
   getAction({type, body}: {type: tableActionsType, body: Faculty} ) {
     this.actions[type](body);

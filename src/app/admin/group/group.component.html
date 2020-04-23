@@ -2,8 +2,7 @@
   <div class="title-box">
     <h3>Групи і студенти</h3>
     <button mat-stroked-button color="prime" (click)="openAddGroupDialog()">
-      <mat-icon aria-hidden="false" aria-label="add">add</mat-icon>
-      Додати нову групу
+      Додати групу
     </button>
   </div>
   <div class="search-box">
@@ -42,7 +41,7 @@
   <section class="container">
 
     <app-mat-table 
-    [data]="listGroups" 
+    [data]="listGroupsChunk" 
     [columns]="columns"  
     [countRecords]="itemsCount"
     [filter]='true'

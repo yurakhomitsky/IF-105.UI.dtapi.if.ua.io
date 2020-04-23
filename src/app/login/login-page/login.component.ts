@@ -31,33 +31,6 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
     this.getLogo();
-    const facultiesSubject = new BehaviorSubject([])
-    facultiesSubject.next([
-      { id: 1, name: 'faculty 1' },
-      { id: 2, name: 'faculty 2' },
-      { id: 3, name: 'faculty 3' },
-  ]);
-  const groupsSubject = new BehaviorSubject([])
-     groupsSubject.next([
-      { faculty_id: 1, group_name: 'PI-16' },
-      { faculty_id: 2, group_name: 'PI-15' },
-      { faculty_id: 3, group_name: 'PI-14' },
-  ]);
-  facultiesSubject.next(
-    [
-      { id: 1, name: 'faculty 11' },
-      { id: 2, name: 'faculty 22' },
-      { id: 3, name: 'faculty 33' },
-  ]
-  );
-   groupsSubject.pipe(
-      withLatestFrom(facultiesSubject),
-      map(([groups,faculties]) => {
-        console.log(groups, faculties);
-        return this.finder(groups,faculties)
-      })
-    )
-    .subscribe(data => console.log(data));
   }
 
   getLogo() {

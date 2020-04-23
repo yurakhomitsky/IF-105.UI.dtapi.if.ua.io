@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -14,56 +14,86 @@ import { TransferStudentModalWindowComponent } from './transfer-student-modal-wi
 import { ViewStudentModalWindowComponent } from './view-student-modal-window/view-student-modal-window.component';
 
 import { Student } from 'src/app/shared/entity.interface';
+import { AppState } from 'src/app/reducers';
+import { Store, select } from '@ngrx/store';
+import { loadStudents, studentDelete } from '../store/student/student-actions';
+import { selectLoadedStudentsGroup, selectAllStudents } from '../store/student/student.selectors';
+import { tap, concatMap, map,  distinctUntilChanged, takeUntil, finalize } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-students',
   templateUrl: './students.component.html',
   styleUrls: ['./students.component.scss'],
 })
-export class StudentsComponent implements OnInit, AfterViewInit {
+export class StudentsComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  public isLoading = true;
   public updateData: boolean;
   public submitButtonText: string;
   public groupdID: number;
-
+  students: Student[] = [];
   public displayedColumns: string[] = ['numeration', 'gradebookID', 'studentNSF', 'UpdateDelete'];
   public dataSource = new MatTableDataSource<Student>();
-
+  students$: Observable<Student[]>;;
+  private unsubscribe = new Subject<void>();
   @ViewChild('table') table: MatTable<Element>;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
-
+  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+  @ViewChild(MatSort, { static: false }) sort: MatSort;
+ public areLoading;
   constructor(
     private apiService: ApiService,
     public dialog: MatDialog,
     private activatedRoute: ActivatedRoute,
     private modalService: ModalService,
     private matSnackBar: MatSnackBar,
+    private store: Store<AppState>
   ) { }
 
   ngOnInit() {
-    this.showStudentsByGroup();
+    this.groupdID = this.activatedRoute.snapshot.params['id'];
+    this.fetchStudents()
+      .pipe(
+        tap(() => { })
+      ).subscribe((students) => {
+        takeUntil(this.unsubscribe)
+        this.showStudentsByGroup(students);
+      })
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
   }
 
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
+  ngOnDestroy(): void {
+    this.unsubscribe.next();
+    this.unsubscribe.complete();
+  }
+  fetchStudents() {
+    return this.store.select(selectLoadedStudentsGroup).pipe(
+      tap(groupsIds => {
+        if (!groupsIds.includes(+this.groupdID)) {
+          this.store.dispatch(loadStudents({ idGroup: this.groupdID }));
+        }
+      }),
+      concatMap(() => this.store.select(selectAllStudents)),
+      map((students) => students.filter((student) => +student.group_id === +this.groupdID)),
+      distinctUntilChanged(),
+    )
+  }
 
-  showStudentsByGroup() {
-    this.groupdID = this.activatedRoute.snapshot.params['id'];
-    this.apiService.getEntityByAction('Student', 'getStudentsByGroup', this.groupdID).subscribe((result: any) => {
-      if (result.response === 'no records') {
-        return this.dataSource.data = undefined;
-      } else {
-        this.dataSource.data = result;
-        this.isLoading = false;
-      }
-    },
-    (error: ResponseInterface) => {
-      this.modalService.openErrorModal('Можливі проблеми із сервером');
-    });
+  showStudentsByGroup(students: Student[]) {
+    // this.dataSource = new MatTableDataSource<Student>();
+    if (students.length === 0) {
+      this.dataSource.data = [];
+    // this.areLoading = false
+    } else {
+      this.dataSource.data = students;
+     // this.areLoading = false
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
+    }
   }
 
   addStudent() {
@@ -73,7 +103,7 @@ export class StudentsComponent implements OnInit, AfterViewInit {
       if (!response) {
         return this.showSnackBar('НЕМАЄ ВІДПОВІДІ ВІД СЕРВЕРУ. МОЖЛИВІ ПРОБЛЕМИ З ПІДКЛЮЧЕННЯМ АБО СЕРВЕРОМ');
       } else if (response.response === 'ok') {
-        this.showStudentsByGroup();
+        // this.showStudentsByGroup();
         return this.showSnackBar('Студент доданий, дані збережено');
       } else if (response === 'Canceled') {
         return this.showSnackBar('Скасовано');
@@ -84,24 +114,25 @@ export class StudentsComponent implements OnInit, AfterViewInit {
   editStudent(student: Student) {
     this.submitButtonText = 'Змінити дані студента';
     this.updateData = true;
-    this.showModalWindow(this.submitButtonText, this.updateData,  student)
-        .afterClosed().subscribe((response) => {
+    this.showModalWindow(this.submitButtonText, this.updateData, student)
+      .afterClosed().subscribe((response) => {
         if (!response) {
           return this.showSnackBar('НЕМАЄ ВІДПОВІДІ ВІД СЕРВЕРУ. МОЖЛИВІ ПРОБЛЕМИ З ПІДКЛЮЧЕННЯМ АБО СЕРВЕРОМ');
         } else if (response.response === 'ok') {
-          this.showStudentsByGroup();
+          // this.showStudentsByGroup();
           return this.showSnackBar('Дані студента змінено та збережено');
         } else if (response === 'Canceled') {
           return this.showSnackBar('Скасовано');
         }
-    });
+      });
   }
 
   deleteStudent(id: string) {
     const idNum = Number.parseInt(id, 10);
-    this.apiService.delEntity('Student', idNum).subscribe((data: { response?: string; } ) => {
+    this.apiService.delEntity('Student', idNum).subscribe((data: { response?: string; }) => {
       if (data && data.response === 'ok') {
-        this.dataSource.data = this.dataSource.data.filter(student => student.user_id !== id);
+        this.store.dispatch(studentDelete({id: idNum}));
+        // this.dataSource.data = this.dataSource.data.filter(student => student.user_id !== id);
         return this.showSnackBar('Студент видалений, дані збережено');
       }
     });
@@ -113,12 +144,12 @@ export class StudentsComponent implements OnInit, AfterViewInit {
         if (!response) {
           return this.showSnackBar('НЕМАЄ ВІДПОВІДІ ВІД СЕРВЕРУ. МОЖЛИВІ ПРОБЛЕМИ З ПІДКЛЮЧЕННЯМ АБО СЕРВЕРОМ');
         } else if (response.response === 'ok') {
-          this.showStudentsByGroup();
+          // this.showStudentsByGroup();
           return this.showSnackBar('Студент переведений');
         } else if (response === 'Canceled') {
           return this.showSnackBar('Скасовано');
         }
-    });
+      });
   }
 
   openConfirmDialog(name: string, surname: string, id: string) {
@@ -138,10 +169,10 @@ export class StudentsComponent implements OnInit, AfterViewInit {
       width: '600px',
       height: 'calc(100vh - 50px)',
       data: {
-          group_id: this.groupdID,
-          student_data: student,
-          updateStudent: edit,
-          submitButtonText: buttonText,
+        group_id: this.groupdID,
+        student_data: student,
+        updateStudent: edit,
+        submitButtonText: buttonText,
       }
     });
   }
@@ -151,8 +182,8 @@ export class StudentsComponent implements OnInit, AfterViewInit {
       disableClose: true,
       width: '600px',
       data: {
-          group_id: this.groupdID,
-          student_data: student
+        group_id: this.groupdID,
+        student_data: student
       }
     });
   }
@@ -163,8 +194,8 @@ export class StudentsComponent implements OnInit, AfterViewInit {
       width: '700px',
       panelClass: 'student-view-dialog-container',
       data: {
-          group_id: this.groupdID,
-          student_data: student
+        group_id: this.groupdID,
+        student_data: student
       }
     });
   }

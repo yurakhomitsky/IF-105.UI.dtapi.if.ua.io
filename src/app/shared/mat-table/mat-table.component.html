@@ -1,8 +1,9 @@
 
 <section *ngIf="filter" class="filter">
-<mat-form-field>
+<mat-form-field appearance="outline"> 
   <mat-label>Пошук</mat-label>
   <input matInput #search >
+  <mat-icon matPrefix>search</mat-icon>
 </mat-form-field>
 </section>
 
@@ -20,8 +21,9 @@
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
 </table>
-<div class="loading-shade" *ngIf="dataSource.data.length === 0">
+<div class="loading-shade" *ngIf="isLoading || dataSource.data.length === 0">
   <div *ngIf="dataSource.data.length === 0 && !isLoading" class="no-data">Дані відсутні.</div>
+  <mat-progress-spinner  *ngIf="isLoading" mode="indeterminate" color='warn'></mat-progress-spinner>
 </div>
 </div>
 
