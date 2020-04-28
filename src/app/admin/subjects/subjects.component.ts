@@ -9,7 +9,7 @@ import { mergeMap, filter, concatMap, tap, take, first, takeUntil } from 'rxjs/o
 import { of, throwError, Observable, Subject, BehaviorSubject,} from 'rxjs';
 import { MatTableDataSource } from '@angular/material/table';
 import { ApiService } from 'src/app/shared/services/api.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { ModalService } from 'src/app/shared/services/modal.service';
 import { TranslateService } from '@ngx-translate/core';
 import { AdminState } from '../store/MainReducer';
@@ -55,15 +55,17 @@ export class SubjectsComponent implements OnInit, OnDestroy {
     private route: Router,
     private modalService: ModalService,
     private translate: TranslateService,
-    private store: Store<AdminState>
+    private store: Store<AdminState>,
+    private router: ActivatedRoute,
   ) { }
 
   ngOnInit(): void {
-    this.showSubjects().pipe(takeUntil(this.unsubscribe)).subscribe();
+    // this.showSubjects().pipe(takeUntil(this.unsubscribe)).subscribe();
     this.subjects$ = this.store.pipe(select(selectAllSubject))
 
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
+    // this.router.data.subscribe((data) => console.log(data))
   }
   ngOnDestroy() {
     this.unsubscribe.next();

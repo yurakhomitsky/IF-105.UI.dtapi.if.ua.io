@@ -139,9 +139,6 @@ export class GroupComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.listGroupsChunk = [...this.chunkArray(this.listGroups, event.page, event.pageSize)];
     }
-    // if(this.chunkArray(this.listGroups, event.page, event.pageSize).length !== 0) {
-    //   this.listGroupsChunk = this.chunkArray(this.listGroups, event.page, event.pageSize);
-    // }
   }
 
 

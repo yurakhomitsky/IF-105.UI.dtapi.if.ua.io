@@ -65,6 +65,8 @@ import { SpecialityEffects } from './store/speciality/speciality-effects';
 import { GroupEffects } from './store/group/group-effects';
 import { StudentEffects } from './store/student/student-effects';
 import { SubjectEffects } from './store/subject/subject-effects';
+import { SubjectResolver } from './subjects/subjects.resolver';
+import { TestEffects } from './store/tests/tests-effects';
 
 
 
@@ -116,6 +118,9 @@ const routes: Routes = [
       },
       {
         path: 'subjects',
+        resolve: {
+          subject: SubjectResolver
+        },
         data: {
           breadcrumb: 'shared.breadbreadcrumb.subjects'
         },
@@ -238,7 +243,7 @@ const routes: Routes = [
     }),
     ChartsModule,
     StoreModule.forFeature('admin',reducers),
-    EffectsModule.forFeature([FacultyEffects, SpecialityEffects,GroupEffects, StudentEffects,SubjectEffects])
+    EffectsModule.forFeature([FacultyEffects, SpecialityEffects,GroupEffects, StudentEffects,SubjectEffects, TestEffects])
   ],
   providers: [
     AdminUserService,

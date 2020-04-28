@@ -1,6 +1,6 @@
 <div class="container">
   <div class="header">
-    <h3>Тести <span *ngIf="currentSubjectId">з предмета: {{ getSubjectNameById(currentSubjectId) }}</span></h3>
+    <h3>Тести <span *ngIf="currentSubjectId">з предмета: {{ getSubjectNameById((this.route.queryParamMap | async).get('subject_id')) }}</span></h3>
     <span class="fill-space"></span>
     <button mat-raised-button color="prime" (click)="openAddTestDialog()" aria-label="add">
       <mat-icon aria-hidden="false" aria-label="add">add</mat-icon>
@@ -9,7 +9,7 @@
   </div>
   <div class="search-box">
     <mat-select [ngModel]="currentSubjectId" (ngModelChange)="onChangeSubject($event)" name="current_subject">
-      <mat-option [value]="subject.subject_id"
+      <mat-option [value]="+subject.subject_id"
                   *ngFor="let subject of listSubjects">{{ subject.subject_name }}</mat-option>
     </mat-select>
   </div>

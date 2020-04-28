@@ -6,6 +6,8 @@ import * as fromSpeciality from '../speciality/speciality-reducer';
 import * as fromGroup from '../group/group-reducers';
 import * as fromStudent from '../student/student-reducers';
 import * as fromSubject from '../subject/subject-reducers';
+import * as fromTest from '../tests/tests-reducers';
+
 
 
 
@@ -16,6 +18,7 @@ export const initialAdminState: AdminState = {
     group: fromGroup.initialGroupsState,
     student: fromStudent.initialStudentState,
     subject: fromSubject.initialSubjectsState,
+    test: fromTest.initialTestState
 };
 
 export interface AdminState {
@@ -24,6 +27,7 @@ export interface AdminState {
     group: fromGroup.GroupState;
     student: fromStudent.StudentState;
     subject: fromSubject.SubjectState;
+    test: fromTest.TestState;
 
 }
 
@@ -33,6 +37,7 @@ export const reducers: ActionReducerMap<AdminState> = {
     group: fromGroup.groupsReducer,
     student: fromStudent.studentsReducer,
     subject: fromSubject.subjectReducer,
+    test: fromTest.testsReducer,
 
 }
 

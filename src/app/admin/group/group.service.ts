@@ -57,7 +57,7 @@ export class GroupService {
 
   getGroups() {
     return this.getBothEntityLoaded$.pipe(
-      concatMap((data) =>  {
+      switchMap((data) =>  {
        return this.store.pipe(select(readyGroup));
       }),
       )
