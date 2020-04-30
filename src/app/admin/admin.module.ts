@@ -67,6 +67,7 @@ import { StudentEffects } from './store/student/student-effects';
 import { SubjectEffects } from './store/subject/subject-effects';
 import { SubjectResolver } from './subjects/subjects.resolver';
 import { TestEffects } from './store/tests/tests-effects';
+import { TestsResolver } from './tests/test.resolver';
 
 
 
@@ -127,20 +128,23 @@ const routes: Routes = [
         children: [
           { path: '', component: SubjectsComponent },
           {
-            path: 'timetable', component: TimeTableComponent,
+            path: 'timetable/:id', component: TimeTableComponent,
             data: {
               breadcrumb: 'shared.breadbreadcrumb.timetable'
             }
           },
           {
-            path: 'tests',
+            path: 'tests/:id',
+            resolve: {
+              tests: TestsResolver
+            },
             data: {
               breadcrumb: 'shared.breadbreadcrumb.tests'
             },
             children: [
               { path: '', component: TestListComponent },
               {
-                path: 'test-detail', component: TestDetailListComponent,
+                path: 'test-detail/:id', component: TestDetailListComponent,
                 data: {
                   breadcrumb: 'Налаштування тестів'
                 }
@@ -242,8 +246,8 @@ const routes: Routes = [
       }
     }),
     ChartsModule,
-    StoreModule.forFeature('admin',reducers),
-    EffectsModule.forFeature([FacultyEffects, SpecialityEffects,GroupEffects, StudentEffects,SubjectEffects, TestEffects])
+    StoreModule.forFeature('admin', reducers),
+    EffectsModule.forFeature([FacultyEffects, SpecialityEffects, GroupEffects, StudentEffects, SubjectEffects, TestEffects])
   ],
   providers: [
     AdminUserService,

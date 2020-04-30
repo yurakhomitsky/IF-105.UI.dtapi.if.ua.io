@@ -8,6 +8,7 @@ import { ModalService } from '../../../shared/services/modal.service';
 import { ApiService } from '../../../shared/services/api.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TestDetailAddComponent } from '../add/test-detail-add.component';
+import { combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-test-detail',
@@ -44,8 +45,8 @@ export class TestDetailListComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.route.queryParamMap.subscribe((params: any) => {
-      this.currentTestId = params.params.test_id;
+    this.route.params.subscribe((params: any) => {
+      this.currentTestId = params.id;
     });
 
     this.initialize();

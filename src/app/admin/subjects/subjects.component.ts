@@ -62,7 +62,6 @@ export class SubjectsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // this.showSubjects().pipe(takeUntil(this.unsubscribe)).subscribe();
     this.subjects$ = this.store.pipe(select(selectAllSubject))
-
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
     // this.router.data.subscribe((data) => console.log(data))
@@ -92,7 +91,9 @@ export class SubjectsComponent implements OnInit, OnDestroy {
         this.openDialog(body);
       },
       route: () => {
-        action.route === 'tests' ? this.navigateToTests(subject_id) : this.navigateToTimeTable(subject_id);
+        this.route.navigate([`${action.route}`,action.body.subject_id], { relativeTo: this.router.parent });
+        // this.route.navigate([`admin/subjects/${action.route}`, action.body.subject_id]);
+        // action.route === 'tests' ? this.navigateToTests(subject_id) : this.navigateToTimeTable(subject_id);
       },
       default() {
         throwError('Error');

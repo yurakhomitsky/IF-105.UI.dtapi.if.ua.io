@@ -52,7 +52,6 @@ export class GroupComponent implements OnInit, AfterViewInit, OnDestroy {
   ];
 
   totalGroups$: Observable<number> = this.store.pipe(select(selectTotalGroups));
-  
   private unsubscribe = new Subject<void>();
   listGroups = [];
   listGroupsChunk = [];
