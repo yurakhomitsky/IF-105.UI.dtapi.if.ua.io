@@ -10,6 +10,13 @@ import { ApiService } from '../../../shared/services/api.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ExportService } from '../../../shared/services/export.service';
 import { ExportImportComponent } from '../export-import/export-import.component';
+import { Store, select } from '@ngrx/store';
+import { AdminState } from '../../store/MainReducer';
+import { loadTests, testCreate, testUpdate, testDelete } from '../../store/tests/tests-actions';
+import { selectAllTests, selectLoadedTestSubject } from '../../store/tests/tests-selectors';
+import { tap, switchMap, map, distinctUntilChanged, filter } from 'rxjs/operators';
+import { selectAllSubject } from '../../store/subject/subject-selectors';
+
 
 @Component({
   selector: 'app-test',
@@ -20,6 +27,7 @@ export class TestListComponent implements OnInit {
   currentSubjectId: number;
   listTests: Test[] = [];
   listSubjects: Subject[] = [];
+  visitedSubjects: number [] = [];
   dataSource = new MatTableDataSource<Test>();
   displayedColumns: string[] = [
     'id',
@@ -36,24 +44,47 @@ export class TestListComponent implements OnInit {
     public dialog: MatDialog,
     protected apiService: ApiService,
     private modalService: ModalService,
-    private route: ActivatedRoute,
+    public route: ActivatedRoute,
     private router: Router,
     private exportService: ExportService,
+    private store: Store<AdminState>
   ) {}
 
   ngOnInit() {
-    this.loadSubjects();
-    this.route.queryParamMap.subscribe((params: any) => {
-      this.currentSubjectId = params.params.subject_id;
+    this.route.queryParamMap.pipe(
+      tap((params) => {
+       this.currentSubjectId = +params.get('subject_id');
+      }),
+      switchMap(() => this.fetchTests())
+    ).
+    subscribe((tests) => {
+      this.listTests = tests;
+      this.dataSource.data = this.listTests;
+      this.dataSource.paginator = this.paginator;
     });
-    this.viewAllTests();
+    this.store.pipe(select(selectAllSubject)).subscribe((subjects) => {
+      this.listSubjects = subjects
+    });
+  }
+  fetchTests() {
+   return this.store.pipe(
+      select(selectLoadedTestSubject),
+      tap((subjecIds) => {
+        if (!subjecIds.includes(this.currentSubjectId))
+        this.store.dispatch(loadTests({subjectId: +this.currentSubjectId}))
+      }),
+      switchMap(() => this.store.select(selectAllTests)),
+      filter((tests) => tests.length > 0),
+      map((tests) => tests.filter((test) => +test.subject_id === +this.currentSubjectId)),
+      distinctUntilChanged(),
+    )
   }
 
   onChangeSubject(newSubjectId: number) {
+    console.log('Im hre');
     this.listTests = [];
     this.currentSubjectId = newSubjectId;
     this.router.navigate([], {queryParams: {subject_id: this.currentSubjectId}});
-    this.viewAllTests();
   }
 
   public openAddTestDialog(): void {
@@ -92,7 +123,7 @@ export class TestListComponent implements OnInit {
     const dialogRef = this.dialog.open(TestAddComponent, {
       width: '500px',
       data: {
-        data: test,
+        data: {...test},
         description: {
           title: 'Редагувати інформацію про тест',
           action: 'Зберегти зміни'
@@ -107,11 +138,10 @@ export class TestListComponent implements OnInit {
     });
   }
 
-  public getSubjectNameById(subjectId: number): string {
+  public getSubjectNameById(subjectId: string): string {
     const subject = this.listSubjects.find(subjectItem => {
-      return subjectItem.subject_id === subjectId;
+      return +subjectItem.subject_id === +subjectId;
     });
-
     if (subject) {
       return subject.subject_name;
     }
@@ -121,15 +151,20 @@ export class TestListComponent implements OnInit {
 
   private addTest(test: Test) {
     this.apiService.createEntity('test', test).subscribe((result: Test[]) => {
-      this.listTests.push(result[0]);
+      this.store.dispatch(testCreate({create: result[0]}))
       this.table.renderRows();
       this.dataSource.paginator = this.paginator;
     });
   }
 
   private editTest(test: Test): void {
-    this.apiService.updEntity('test', test, test.test_id).subscribe(() => {
-      this.dataSource.data = this.listTests;
+    console.log(test);
+    this.apiService.updEntity('test', test, test.test_id).subscribe((data) => {
+      this.store.dispatch(testUpdate({update: {
+        id: test.test_id,
+        changes: test
+      }}))
+      // this.dataSource.data = this.listTests;
     }, (error: any) => {
       if (error.error.response.includes('Error when update')) {
         this.modalService.openErrorModal('Дані не оновлювалися');
@@ -142,37 +177,14 @@ export class TestListComponent implements OnInit {
   private removeTest(id: number) {
     this.apiService.delEntity('test', id)
       .subscribe((response) => {
+        this.store.dispatch(testDelete({id}))
           this.modalService.openInfoModal('Тест видалено');
-          this.viewAllTests();
         },
         err => {
           this.modalService.openErrorModal('Помилка видалення');
         });
   }
 
-  private loadSubjects() {
-    this.apiService.getEntity('subject').subscribe((result: Subject[]) => {
-      this.listSubjects = result;
-    });
-  }
-
-  private viewAllTests() {
-    let request = this.apiService.getEntity('test');
-
-    if (this.currentSubjectId) {
-      request = this.apiService.getTestsBySubject('test', this.currentSubjectId);
-    }
-
-    request.subscribe((result: Test[]) => {
-      if (result['response'] === 'no records') {
-        result = [];
-      }
-
-      this.listTests = result;
-      this.dataSource.data = this.listTests;
-      this.dataSource.paginator = this.paginator;
-    });
-  }
 
   public navigateToTestDetail(testId: number) {
     this.router.navigate(['/admin/subjects/tests/test-detail'], { queryParams: { test_id: testId }});

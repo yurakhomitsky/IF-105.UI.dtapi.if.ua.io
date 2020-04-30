@@ -18,3 +18,7 @@ export const selectLoadedStudentsGroup = createSelector(
     selectStudentState,
     student => student.groupsLoaded
 )
+export const selectLoadingStudents = createSelector(
+    selectStudentState,
+    student => student.loading
+);

@@ -15,7 +15,7 @@
     <mat-label>Предмет</mat-label>
     <mat-select [(ngModel)]="data.data.subject_id" name="subject_id" #subject_id="ngModel" required>
       <mat-option
-        *ngFor="let item of subjects"
+        *ngFor="let item of subjects$ | async"
         [value]="item.subject_id"
       >
         {{item.subject_name}}

@@ -17,7 +17,7 @@ import { Student } from 'src/app/shared/entity.interface';
 import { AppState } from 'src/app/reducers';
 import { Store, select } from '@ngrx/store';
 import { loadStudents, studentDelete } from '../store/student/student-actions';
-import { selectLoadedStudentsGroup, selectAllStudents } from '../store/student/student.selectors';
+import { selectLoadedStudentsGroup, selectAllStudents, selectLoadingStudents } from '../store/student/student.selectors';
 import { tap, concatMap, map,  distinctUntilChanged, takeUntil, finalize } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
 
@@ -39,7 +39,7 @@ export class StudentsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('table') table: MatTable<Element>;
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: false }) sort: MatSort;
- public areLoading;
+  public isLoading = this.store.select(selectLoadingStudents);
   constructor(
     private apiService: ApiService,
     public dialog: MatDialog,
