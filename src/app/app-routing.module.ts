@@ -21,6 +21,7 @@ const routes: Routes = [
 @NgModule({
   imports: [RouterModule.forRoot(routes , {
     anchorScrolling: 'enabled',
+    // enableTracing: true
   })],
   exports: [RouterModule],
   providers: [AdminGuard],

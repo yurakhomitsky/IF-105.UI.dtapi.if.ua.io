@@ -7,7 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { TestAddComponent } from '../add/test-add.component';
 import { ModalService } from '../../../shared/services/modal.service';
 import { ApiService } from '../../../shared/services/api.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, Params } from '@angular/router';
 import { ExportService } from '../../../shared/services/export.service';
 import { ExportImportComponent } from '../export-import/export-import.component';
 import { Store, select } from '@ngrx/store';
@@ -51,9 +51,9 @@ export class TestListComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.route.queryParamMap.pipe(
-      tap((params) => {
-       this.currentSubjectId = +params.get('subject_id');
+    this.route.params.pipe(
+      tap((params: Params) => {
+        this.currentSubjectId = +params.id;
       }),
       switchMap(() => this.fetchTests())
     ).
@@ -81,10 +81,10 @@ export class TestListComponent implements OnInit {
   }
 
   onChangeSubject(newSubjectId: number) {
-    console.log('Im hre');
     this.listTests = [];
     this.currentSubjectId = newSubjectId;
-    this.router.navigate([], {queryParams: {subject_id: this.currentSubjectId}});
+    this.router.navigate(['../../','tests',this.currentSubjectId], { relativeTo: this.route.parent });
+    // this.router.navigate([], {queryParams: {subject_id: this.currentSubjectId}});
   }
 
   public openAddTestDialog(): void {
