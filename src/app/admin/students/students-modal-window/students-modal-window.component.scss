@@ -6,7 +6,19 @@ mat-icon {
     text-align: center;
     margin-bottom: 15px;
 }
-
+.student_form {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.student_form_column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 300px;
+    margin: 5px;
+}
 .closeForm {
     display: flex;
     justify-content: flex-end;
@@ -26,17 +38,23 @@ mat-form-field {
 .hide_icon {
     font-size: 20px!important;
 }
-
+.submit {
+    display: block;
+    margin: 0 auto;
+}
 .submit {
     width: calc(50% - 10px);
     &:first-of-type {
-        margin-right: 20px;
+        // margin-right: 20px;
     }
 }
 
 @media screen and (max-width: 600px) {
     .submit {
         width: 50%;
+    }
+    .student_form{
+        flex-wrap: wrap;
     }
 }
 

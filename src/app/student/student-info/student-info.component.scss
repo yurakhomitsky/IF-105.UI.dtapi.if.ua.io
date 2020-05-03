@@ -1,12 +1,12 @@
-
 button {
   width: fit-content;
 }
-
+$color-primary-light: #3981df;
+$color-grey-text: #848484;
 .main-container {
+  font-size: 100%;
   width: 100%;
   display: flex;
-  flex-direction: row-reverse;
   justify-content: space-around;
   margin-top: 3em;
 }
@@ -15,10 +15,83 @@ button {
   text-align: center;
   margin-bottom: 2em;
 }
-
+.mat-card-header {
+  justify-content: center;
+}
 table {
   width: 100%;
-  margin-right: 5em;
+}
+.table-info {
+  height: 500px;
+  overflow: auto;
+  margin: 20px;
+  box-shadow: 0 1px 3px black;
+}
+.student_description p {
+  font-size: 1.2rem;
+}
+.mat-table-sticky:first-child {
+  border-right: 1px solid #e0e0e0;
+}
+
+.profile_card { 
+  margin:  15px;
+}
+.profile_information {
+  &_content:first-child {
+    font-size: 1.3rem;
+    font-weight: 500;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    text-align: center;
+  }
+  &_content {
+    margin-bottom: 10px
+  }
+  .s_title {
+    font-size: 1.1rem;
+    font-weight: 400;
+  }
+  .s_description {
+    font-size: 1.1rem;
+    word-wrap: break-word;
+    color: $color-grey-text;
+  }
+}
+
+.view__profile {
+  margin-bottom: 20px;
+  &_container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  .table-info {
+    width: 700px;
+    height: 400px;
+    overflow: auto;
+  }
+  table {
+    width: 130%;
+  }
+}
+@media screen and (max-width: 1010px) {
+  .main-container {
+    flex-wrap: wrap-reverse;
+    margin-top: 1rem;
+  }
+  .test-details {
+    margin-top: 80px;
+  }
+  table {
+    width: 120%;
+  }
+  .table-info {
+    width: 95%;
+  }
 }
 
 .mat-column-subject {
@@ -149,7 +222,7 @@ table {
   margin-left: 5em;
 }
 
-.student-info>img {
+.student-info > img {
   display: block;
   margin-left: auto;
   margin-right: auto;

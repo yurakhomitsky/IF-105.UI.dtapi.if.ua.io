@@ -13,29 +13,28 @@
 
   <mat-nav-list *ngIf="!(isSmall$ | async) && !(isXSmall$ | async) && (currentUser$ | async)?.roles.includes('admin')  ">
     <a routerLinkActive="mat-raised-button" mat-button routerLink="dashboard"
-      >{{'sidenav.dashboard'|translate}}</a
-    >
+      >{{'sidenav.dashboard'|translate}}</a>
+
     <a routerLinkActive="mat-raised-button" mat-button routerLink="faculties"
-      >{{'sidenav.faculties'|translate}}</a
-    >
+      >{{'sidenav.faculties'|translate}}</a>
+
     <a routerLinkActive="mat-raised-button" mat-button routerLink="group"
-      >{{'sidenav.group'|translate}}</a
-    >
+      >{{'sidenav.group'|translate}}</a>
+
     <a routerLinkActive="mat-raised-button" mat-button routerLink="speciality"
-      >{{'sidenav.speciality'|translate}}</a
-    >
+      >{{'sidenav.speciality'|translate}}</a>
+
     <a routerLinkActive="mat-raised-button" mat-button routerLink="subjects"
-      >{{'sidenav.subjects'|translate}}</a
-    >
+      >{{'sidenav.subjects'|translate}}</a>
+
     <a routerLinkActive="mat-raised-button" mat-button routerLink="results"
-      >{{'sidenav.results'|translate}}</a
-    >
+      >{{'sidenav.results'|translate}}</a>
+
     <a routerLinkActive="mat-raised-button" mat-button routerLink="protocol"
-    >{{'sidenav.protocol'|translate}}</a
-  >
+    >{{'sidenav.protocol'|translate}}</a>
+    
     <a routerLinkActive="mat-raised-button" mat-button routerLink="admin-user"
-      >{{'sidenav.admin-user'|translate}}</a
-    >
+      >{{'sidenav.admin-user'|translate}}</a>
   </mat-nav-list>
   <span class="fill-space"></span>
 

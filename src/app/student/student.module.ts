@@ -17,6 +17,10 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { StudentInfoComponent } from './student-info/student-info.component';
 import {CountdownModule} from 'ngx-countdown';
 import {StudentInfoService} from './student-info.service';
+import { StoreModule } from '@ngrx/store';
+import { reducers } from './store/mainReducer';
+import { EffectsModule } from '@ngrx/effects';
+import { TimeTableEffects } from './store/studentTimeTable/studentTimeTable.effects';
 
 const routes: Routes = [
   {
@@ -53,6 +57,8 @@ const routes: Routes = [
         MatButtonModule,
         SharedModule,
         CountdownModule,
+        StoreModule.forFeature('student', reducers),
+        EffectsModule.forFeature([TimeTableEffects])
     ],
   providers: [
     TestPlayerService,
