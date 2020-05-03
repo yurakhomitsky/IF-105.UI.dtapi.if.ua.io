@@ -91,7 +91,7 @@ export class TestListComponent implements OnInit {
     const dialogRef = this.dialog.open(TestAddComponent, {
       width: '500px',
       data: {
-        data: this.currentSubjectId ? {subject_id: this.currentSubjectId} : {},
+        data: this.currentSubjectId ? {subject_id: this.currentSubjectId.toString()} : {},
         description: {
           title: 'Додати новий тест',
           action: 'Додати'

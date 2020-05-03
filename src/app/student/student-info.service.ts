@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {Faculty, Group, Speciality, StudentInfo, TimeTable} from '../shared/entity.interface';
+import {Faculty, Group, Speciality, StudentInfo, TimeTable, TestsForStudent} from '../shared/entity.interface';
 import {concatMap, map, switchMap} from 'rxjs/operators';
 import {Subject, Test} from '../admin/entity.interface';
 import {AuthService} from '../shared/auth.service';
@@ -75,13 +75,39 @@ export class StudentInfoService {
       })
     );
   }
-
+   formDataSource(timeTableArray: TestsForStudent[], testArray: Test[]) {
+    return testArray.map((value) => {
+      this.findTestArray(timeTableArray,value.subject_id)
+      return {
+        ...value,
+        ...this.findTestArray(timeTableArray,value.subject_id),
+        can_be_start: this.canTestBeStart({
+          ...value,
+          ...this.findTestArray(timeTableArray,value.subject_id)
+        })
+      }
+    })
+  }
+    findTestArray(testArray: TestsForStudent[], id) {
+      return  testArray.find(item => item.subject_id === id);
+    }
+    private canTestBeStart(row: TestsForStudent) {
+    const currDate = new Date();
+    const startDate = new Date(`${row.start_date} ${row.start_time}`);
+    const endDate = new Date(`${row.end_date} ${row.end_time}`);
+    return currDate >= startDate && currDate <= endDate && +row.enabled === 1;
+  }
   getTimeTable(groupId) {
+    const now = new Date();
     const timeTable = [];
     return this.getTimeTableByGroup(groupId).pipe(
       switchMap((timeTableData: TimeTable[]) => {
         const filteredTimeTable = timeTableData
-          .map(({timetable_id, group_id, ...rest}) => rest);
+          .map(({timetable_id, group_id, ...rest}) => rest)
+          .filter((item) => {
+            const date = new Date(item.end_date)
+            return date > now;
+          } )
         timeTable.push(filteredTimeTable);
         return this.getSubjects();
       }),

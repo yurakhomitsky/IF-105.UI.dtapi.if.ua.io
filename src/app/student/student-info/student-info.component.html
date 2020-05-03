@@ -1,17 +1,56 @@
 <div class="main-container">
-  <section class="student-info">
+  <!-- <section class="student-info">
     <h3 class="header">Особиста Інформація Студента</h3>
     <img alt="Фото Студента" [src]="studentInfo?.photo">
-    <p>{{studentInfo?.student_surname}} {{studentInfo?.student_name}} {{studentInfo?.student_fname}}</p>
-    <p>Факультет: {{studentInfo?.faculty_name}}</p>
-    <p>Спеціальність: {{studentInfo?.speciality_code}} {{studentInfo?.speciality_name}}</p>
-    <p>Група: {{studentInfo?.group_name}}</p>
-    <p>Номер залікової книжки: {{studentInfo?.gradebook_id}}</p>
-  </section>
+    <div class="student_description">
+      <p>{{studentInfo?.student_surname}} {{studentInfo?.student_name}} {{studentInfo?.student_fname}}</p>
+      <p>Факультет: {{studentInfo?.faculty_name}}</p>
+      <p>Спеціальність: {{studentInfo?.speciality_code}} {{studentInfo?.speciality_name}}</p>
+      <p>Група: {{studentInfo?.group_name}}</p>
+      <p>Номер залікової книжки: {{studentInfo?.gradebook_id}}</p>
+    </div>
+  
+  </section> -->
+  <mat-card class="profile_card">
+    <mat-card-header>
+      <mat-card-title>Особиста Інформація студента</mat-card-title>
+    </mat-card-header>
+    <mat-card-content  class="view__profile">
+        <div class="view__profile_container">
+            <div class="profile_photo">
+                 <img class="photo" alt="Фото студента" [src]="studentInfo?.photo">
+            </div>
+                <div class="profile_information">
+                    <div class="profile_information_content">
+                        <p>{{studentInfo?.student_surname}} {{studentInfo?.student_name}} {{studentInfo?.student_fname}}</p>
+                        <h4 class="s_description"></h4>
+                    </div>
+                    <div class="profile_information_content">
+                        <div class="s_title">Факультет</div>
+                        <div class="s_description">{{studentInfo?.faculty_name}}</div>
+                    </div>
+                    
+                    <div class="profile_information_content">
+                        <div class="s_title">Спеціальність</div>
+                        <div  class="s_description">{{studentInfo?.speciality_code}} {{studentInfo?.speciality_name}}</div>
+                    </div>
+                    <div class="profile_information_content">
+                      <div class="s_title">Група</div>
+                      <div  class="s_description">{{studentInfo?.group_name}}</div>
+                  </div>
+                  <div class="profile_information_content">
+                    <div class="s_title">Заліковна книжка</div>
+                    <div  class="s_description">{{studentInfo?.gradebook_id}}</div>
+                </div>
+                </div>
+        </div>
+    </mat-card-content>
+</mat-card>
   <section class="test-details">
     <h3 class="header">Розклад Тестування</h3>
-    <table mat-table #table [dataSource]="dataSource">
-      <ng-container matColumnDef="subject">
+    <div class="table-info">
+    <table  mat-table #table [dataSource]="dataSource">
+      <ng-container matColumnDef="subject" sticky>
         <th mat-header-cell *matHeaderCellDef>Предмет</th>
         <td mat-cell *matCellDef="let tableEl">
           {{tableEl.subject_name}}
@@ -68,13 +107,15 @@
           </mat-icon>
         </td>
       </ng-container>
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns;  sticky: true"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-    <mat-paginator
+    <!-- <mat-paginator
+      [pageSize]="10"
       [pageSizeOptions]="[5, 10, 20]"
       showFirstLastButtons>
-    </mat-paginator>
+    </mat-paginator> -->
+  </div>
   </section>
 </div>
 <router-outlet></router-outlet>

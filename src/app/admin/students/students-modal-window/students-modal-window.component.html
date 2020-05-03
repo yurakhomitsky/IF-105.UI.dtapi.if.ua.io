@@ -7,37 +7,39 @@
 </header>
 
 <form [formGroup]="studentForm" (ngSubmit)="handleSubmit(studentForm.value)">
-    
-    <mat-form-field class="example-full-width">
+<div class="student_form">
+<div class="student_form_column">
+    <mat-form-field appearance="outline" class="example-full-width">
         <input placeholder="Прізвище" matInput type="text" formControlName="lastname">
         <mat-error *ngIf="studentForm.get('lastname').invalid && (studentForm.get('lastname').dirty || studentForm.get('lastname').touched)">
             <span *ngIf="studentForm.get('lastname').errors.required">Поле не заповнене </span>
         </mat-error>
     </mat-form-field>
 
-    <mat-form-field class="example-full-width">
+    <mat-form-field appearance="outline" class="example-full-width">
         <input placeholder="Ім'я" matInput type="text" formControlName="firstname">
         <mat-error *ngIf="studentForm.get('firstname').invalid && (studentForm.get('firstname').dirty || studentForm.get('firstname').touched)">
             <span *ngIf="studentForm.get('firstname').errors.required">Поле не заповнене </span>
         </mat-error>
     </mat-form-field>
 
-    <mat-form-field class="example-full-width">
+    <mat-form-field appearance="outline" class="example-full-width">
         <input placeholder="По-батькові" matInput type="text" formControlName="fathername">
         <mat-error *ngIf="studentForm.get('fathername').invalid && (studentForm.get('fathername').dirty || studentForm.get('fathername').touched)">
             <span *ngIf="studentForm.get('fathername').errors.required">Поле не заповнене </span>
         </mat-error>
     </mat-form-field>
 
-    <mat-form-field class="example-full-width">
+    <mat-form-field appearance="outline" class="example-full-width">
         <input placeholder="Номер залікової книжки" matInput type="text" formControlName="gradebookID">
         <mat-error *ngIf="studentForm.get('gradebookID').invalid && (studentForm.get('gradebookID').dirty || studentForm.get('gradebookID').touched)">
             <span *ngIf="studentForm.get('gradebookID').errors.required">Поле не заповнене </span>
             <span *ngIf="studentForm.get('gradebookID').errors.propertyIsNotUnique">Користувач з таким номером залікової книжки вже існує</span>
         </mat-error>
     </mat-form-field>
-
-    <mat-form-field class="example-full-width">
+</div>
+<div class="student_form_column">
+    <mat-form-field appearance="outline" class="example-full-width">
         <input placeholder="Унікальне ім'я користувача в системі" matInput type="text" formControlName="login">
         <mat-error *ngIf="studentForm.get('login').invalid && (studentForm.get('login').dirty || studentForm.get('login').touched)">
             <span *ngIf="studentForm.get('login').errors.required">Поле не заповнене </span>
@@ -45,7 +47,7 @@
         </mat-error>
     </mat-form-field>
 
-    <mat-form-field class="example-full-width">
+    <mat-form-field appearance="outline" class="example-full-width">
         <input placeholder="Електронна пошта" matInput type="text" formControlName="email">
         <mat-error *ngIf="studentForm.get('email').invalid && (studentForm.get('email').dirty || studentForm.get('email').touched)">
             <span *ngIf="studentForm.get('email').errors.required">Поле не заповнене </span>
@@ -54,7 +56,7 @@
         </mat-error>
     </mat-form-field>
 
-    <mat-form-field class="example-full-width">
+    <mat-form-field appearance="outline" class="example-full-width">
         <input matInput placeholder="Введіть пароль" [type]="hide ? 'password' : 'text'" formControlName="password">
         <button type="button" mat-icon-button matSuffix (click)="hidePassword()" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
             <mat-icon class="hide_icon">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
@@ -65,7 +67,7 @@
         </mat-error>
     </mat-form-field>
 
-    <mat-form-field class="example-full-width">
+    <mat-form-field  appearance="outline" class="example-full-width">
         <input matInput placeholder="Підтвердіть пароль" [type]="hide ? 'password' : 'text'" formControlName="password_confirm">
         <button type="button" mat-icon-button matSuffix (click)="hidePassword()" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
             <mat-icon class="hide_icon">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
@@ -76,7 +78,8 @@
             <span *ngIf="studentForm.get('password_confirm').errors.notEquivalent">Паролі не співпадають</span>
         </mat-error>
     </mat-form-field>
-
+</div>
+</div>
     <div class="current_student_photo" *ngIf="this.data.updateStudent && this.data.student_data.photo !=='' && showCurrentPhoto">
         <img [src]="this.data.student_data.photo" class="student_photo" alt="Student Photo">
     </div>
@@ -113,7 +116,6 @@
         </div>
         <div *ngIf="loadImageFail" class="no__image">Тип даного файлу не підтримується.<br>Будь ласка, використайте png, gif або jpg формат</div>
     </div>
-
     <button class="submit" mat-stroked-button color="primary" type="submit" [disabled]="!studentForm.valid">{{ this.data.submitButtonText }}</button>
       
 </form>

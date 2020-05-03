@@ -20,6 +20,7 @@ import { loadStudents, studentDelete } from '../store/student/student-actions';
 import { selectLoadedStudentsGroup, selectAllStudents, selectLoadingStudents } from '../store/student/student.selectors';
 import { tap, concatMap, map,  distinctUntilChanged, takeUntil, finalize } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
+import { checkIdsLoaded } from '../store/store-operators';
 
 @Component({
   selector: 'app-students',
@@ -71,13 +72,22 @@ export class StudentsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.unsubscribe.complete();
   }
   fetchStudents() {
+    // return this.store.select(selectLoadedStudentsGroup).pipe(
+    //   tap(groupsIds => {
+    //     if (!groupsIds.includes(+this.groupdID)) {
+    //       this.store.dispatch(loadStudents({ idGroup: this.groupdID }));
+    //     }
+    //   }),
+    //   concatMap(() => this.store.select(selectAllStudents)),
+    //   map((students) => students.filter((student) => +student.group_id === +this.groupdID)),
+    //   distinctUntilChanged(),
+    // )
     return this.store.select(selectLoadedStudentsGroup).pipe(
-      tap(groupsIds => {
-        if (!groupsIds.includes(+this.groupdID)) {
-          this.store.dispatch(loadStudents({ idGroup: this.groupdID }));
-        }
+      checkIdsLoaded<Student>({
+        id: +this.groupdID,
+        dispatch: () =>  this.store.dispatch(loadStudents({ idGroup: this.groupdID })),
+        select: () => this.store.select(selectAllStudents)
       }),
-      concatMap(() => this.store.select(selectAllStudents)),
       map((students) => students.filter((student) => +student.group_id === +this.groupdID)),
       distinctUntilChanged(),
     )
@@ -147,7 +157,7 @@ export class StudentsComponent implements OnInit, AfterViewInit, OnDestroy {
           // this.showStudentsByGroup();
           return this.showSnackBar('Студент переведений');
         } else if (response === 'Canceled') {
-          return this.showSnackBar('Скасовано');
+          // return this.showSnackBar('Скасовано');
         }
       });
   }
@@ -166,7 +176,7 @@ export class StudentsComponent implements OnInit, AfterViewInit, OnDestroy {
   showModalWindow(buttonText: string, edit?: boolean, student?: Student) {
     return this.dialog.open(StudentsModalWindowComponent, {
       disableClose: true,
-      width: '600px',
+      width: '700px',
       height: 'calc(100vh - 50px)',
       data: {
         group_id: this.groupdID,
