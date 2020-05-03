@@ -120,7 +120,7 @@ export class TestPlayerComponent implements OnInit, OnDestroy {
 
   synchronizeTime() {
     this.testPlayerService.getTime().subscribe((data: any) => {
-      this.serverTime = data.curtime;
+      this.serverTime = data.curtime * 1000;
       this.timer = this.timeForTest - (this.serverTime - this.userTime);
     });
   }
