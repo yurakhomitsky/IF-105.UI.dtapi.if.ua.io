@@ -132,6 +132,11 @@ export class SubjectsComponent implements OnInit, OnDestroy {
           // this.dataSource.data = [...this.dataSource.data, newData[0]];
           this.translateSnackBar('subjects.snackbarMessageCreate', 'X');
         }
+      },
+      err => {
+        if (err.error.response.includes('Duplicate')) {
+          this.modalService.openErrorModal(`Такий предмет уже існує`);
+        }
       });
   }
 

@@ -13,7 +13,6 @@ export class TestsResolver implements Resolve<boolean> {
     constructor(private store: Store<AdminState>) {}
 
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
-        // console.log(route.params.id);
         return this.store.pipe(
             select(selectLoadedTestSubject),
             tap((subjectIds) => {

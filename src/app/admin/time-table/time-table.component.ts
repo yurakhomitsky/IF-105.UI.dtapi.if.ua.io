@@ -47,14 +47,15 @@ export class TimeTableComponent implements OnInit {
   isLoaded: boolean;
 
   ngOnInit() {
-    this.route.queryParamMap.subscribe((params: any) => {
-      this.subjectId = params.params.id;
+    this.route.params.subscribe((params: any) => {
+      this.subjectId = params.id;
       this.getTimeTable(this.subjectId);
       this.getSubject(this.subjectId);
     });
   }
 
   addTimeTableDialog(): void {
+    console.log(this.subjectId);
     const dialogRef = this.dialog.open(TimeTableAddDialogComponent, {
       width: '600px',
       data: {
