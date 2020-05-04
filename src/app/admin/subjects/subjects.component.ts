@@ -92,8 +92,6 @@ export class SubjectsComponent implements OnInit, OnDestroy {
       },
       route: () => {
         this.route.navigate([`${action.route}`,action.body.subject_id], { relativeTo: this.router.parent });
-        // this.route.navigate([`admin/subjects/${action.route}`, action.body.subject_id]);
-        // action.route === 'tests' ? this.navigateToTests(subject_id) : this.navigateToTimeTable(subject_id);
       },
       default() {
         throwError('Error');
