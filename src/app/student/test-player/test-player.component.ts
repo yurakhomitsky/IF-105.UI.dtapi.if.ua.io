@@ -57,7 +57,7 @@ export class TestPlayerComponent implements OnInit, OnDestroy {
     this.route.queryParamMap.subscribe((params: any) => {
       const testId = params.params.id;
       this.getTimeForTest(testId);
-      this.userTime = Math.floor(Date.now() / 1000) + 7200;
+      this.userTime = Math.floor(Date.now() / 1000) + 10800;
       return this.testPlayerService.getQuestionList(+testId)
         .subscribe(questions => {
           this.questions = questions;
@@ -65,7 +65,7 @@ export class TestPlayerComponent implements OnInit, OnDestroy {
     });
     this.testInProgress = setInterval(() => {
       this.synchronizeTime();
-    }, 60000);
+    }, 10000);
   }
 
   ngOnDestroy() {
@@ -120,8 +120,8 @@ export class TestPlayerComponent implements OnInit, OnDestroy {
 
   synchronizeTime() {
     this.testPlayerService.getTime().subscribe((data: any) => {
-      this.serverTime = data.curtime * 1000;
-      this.timer = this.timeForTest - (this.serverTime - this.userTime);
+      this.serverTime = data.curtime;
+      this.timer = this.timeForTest - (this.serverTime - this.userTime) ;
     });
   }
 

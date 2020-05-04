@@ -22,7 +22,6 @@ export function areDataLoaded(fn: (value?) => void) {
     return (source: Observable<boolean>) => {
         return source.pipe(
             tap((hasLoaded) => {
-                console.log(hasLoaded)
                 if (!hasLoaded) {
                     fn()
                 }

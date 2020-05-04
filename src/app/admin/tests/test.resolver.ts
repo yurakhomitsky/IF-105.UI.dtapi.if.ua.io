@@ -21,7 +21,7 @@ export class TestsResolver implements Resolve<boolean> {
                 }
             }),
             filter(subjectIds => subjectIds.includes(+route.params.id)),
-            map(Boolean),
+            map((subjectIds) => !!subjectIds),
             first()
         )
     }

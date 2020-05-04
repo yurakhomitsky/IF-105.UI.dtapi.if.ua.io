@@ -135,9 +135,6 @@ const routes: Routes = [
           },
           {
             path: 'tests/:id',
-            resolve: {
-              tests: TestsResolver
-            },
             data: {
               breadcrumb: 'shared.breadbreadcrumb.tests'
             },

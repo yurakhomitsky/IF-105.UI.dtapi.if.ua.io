@@ -8,6 +8,7 @@ import TestsActions from './tests-types';
 export interface TestState extends EntityState<Test> {
     loading: boolean;
     subjectsLoaded: number[];
+    noRecords: boolean;
 }
 
 export const adapter = createEntityAdapter<Test>({
@@ -17,6 +18,7 @@ export const adapter = createEntityAdapter<Test>({
 export const initialTestState = adapter.getInitialState({
     loading: false,
     subjectsLoaded: [],
+    noRecords: false
 });
 
 export const testsReducer = createReducer(
@@ -33,7 +35,7 @@ export const testsReducer = createReducer(
 
     on(TestsActions.testDelete, (state, action) => adapter.removeOne(action.id, state)),
 
-    on(TestsActions.testError, (state, action) => ({ ...state, loading: false }))
+    on(TestsActions.testError, (state, action) => ({ ...state, loading: false, noRecords: action.failed }))
 );
 
 

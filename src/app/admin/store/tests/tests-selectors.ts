@@ -22,3 +22,8 @@ export const selectLoadingTests = createSelector(
     selectTestState,
     test => test.loading
 );
+
+export const selectNoRecordsTests = createSelector(
+    selectTestState,
+    test => test.noRecords
+)
