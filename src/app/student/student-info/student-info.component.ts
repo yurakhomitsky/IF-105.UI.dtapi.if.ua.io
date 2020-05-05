@@ -85,22 +85,22 @@ export class StudentInfoComponent implements OnInit {
         id: tableEl.test_id,
       }
     });
-  //   this.testPlayerService.getLog(tableEl.test_id)
-  //     .subscribe(() => {
-  //       if (tableEl.can_be_start) {
-  //         this.session.set('testInProgress', true);
-  //         this.router.navigate(['student/test-player'], {
-  //           queryParams: {
-  //             id: tableEl.test_id,
-  //           }
-  //         });
-  //       } else {
-  //         this.modalService.openAlertModal('Тест ще не доступний для проходження на даний момент', '', '');
-  //       }
-  //     },
-  //       ({ error }) => {
-  //         this.modalService.openAlertModal(ErrorResponse[error.response], 'Помилка', 'info');
-  //       })
+    this.testPlayerService.getLog(tableEl.test_id)
+      .subscribe(() => {
+        if (tableEl.can_be_start) {
+          this.session.set('testInProgress', true);
+          this.router.navigate(['student/test-player'], {
+            queryParams: {
+              id: tableEl.test_id,
+            }
+          });
+        } else {
+          this.modalService.openAlertModal('Тест ще не доступний для проходження на даний момент', '', '');
+        }
+      },
+        ({ error }) => {
+          this.modalService.openAlertModal(ErrorResponse[error.response], 'Помилка', 'info');
+        })
    }
 
 }
