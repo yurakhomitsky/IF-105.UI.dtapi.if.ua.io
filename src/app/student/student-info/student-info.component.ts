@@ -80,11 +80,6 @@ export class StudentInfoComponent implements OnInit {
 
 
   public goToTest(tableEl: TestsForStudent) {
-    this.router.navigate(['student/test-player'], {
-      queryParams: {
-        id: tableEl.test_id,
-      }
-    });
     this.testPlayerService.getLog(tableEl.test_id)
       .subscribe(() => {
         if (tableEl.can_be_start) {

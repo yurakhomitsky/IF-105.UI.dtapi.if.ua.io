@@ -65,7 +65,7 @@ export class TestPlayerComponent implements OnInit, OnDestroy {
     });
     this.testInProgress = setInterval(() => {
       this.synchronizeTime();
-    }, 10000);
+    }, 60000);
   }
 
   ngOnDestroy() {
