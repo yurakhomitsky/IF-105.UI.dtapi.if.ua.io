@@ -1,12 +1,10 @@
 <section class="header">
   <h3>Розклад тестів для предмету: <i>{{this.subject?.subject_name}}</i></h3>
   <span class="fill-space"></span>
-  <button mat-stroked-button color="prime" (click)="addTimeTableDialog()">
-    <mat-icon aria-hidden="false" aria-label="add">add</mat-icon>
-    Додати новий розклад
+  <button mat-raised-button color="prime" (click)="addTimeTableDialog()">
+    Додати  розклад
   </button>
 </section>
-
 <section class="container">
   <table mat-table #table [dataSource]="dataSource">
     <ng-container matColumnDef="id">

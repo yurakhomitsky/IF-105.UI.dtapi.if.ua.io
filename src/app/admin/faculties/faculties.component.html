@@ -1,12 +1,5 @@
 
-<section class="header" >
-  <h3>Факультети</h3>
-  <span class="fill-space"></span>
-  <button
-  mat-stroked-button
-  class="btn" (click)='openFacultyModal()'>
-    Додати факультет</button>
-</section>
+<app-header-entity [entityName]="'Факультети'" [buttonName]="'факультет'" (buttonClick)="openFacultyModal()" ></app-header-entity>
 
 <section class="container">
 

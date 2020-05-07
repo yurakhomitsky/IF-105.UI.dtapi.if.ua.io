@@ -1,17 +1,4 @@
-<div class="toolbar">
-    <ng-container>
-        <h2>{{'subjects.headerMain'| translate}}</h2>
-    </ng-container>
-
-    <ng-container>
-        <div class="mat-elevation-z9 ">
-            <button class="addSubject" mat-stroked-button (click)="createNewSubject()">
-                Додати предмет
-            </button>
-        </div>
-        
-    </ng-container>
-</div>
+<app-header-entity [entityName]="'Предмети'" [buttonName]="'предмет'" (buttonClick)="createNewSubject()"></app-header-entity>
 
 <section class="container">
 

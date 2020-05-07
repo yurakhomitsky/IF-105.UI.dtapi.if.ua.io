@@ -1,11 +1,7 @@
 <section class="administrate__students">
 
-  <div class="button-wrapper">
-      <h3>Студенти</h3>
-    <button class="addStudent" mat-stroked-button (click)="addStudent()">
-      Додати студента
-    </button>
-  </div>
+  <app-header-entity [entityName]="'Студенти'" [buttonName]="'студента'" (buttonClick)="addStudent()" ></app-header-entity>
+
   <div class="mat-table-wrapper" *ngIf="dataSource.data.length!== 0">
         <table mat-table  [dataSource]="dataSource" #table class="table student__list" matSort>
           

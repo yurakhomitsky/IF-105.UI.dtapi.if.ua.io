@@ -55,6 +55,7 @@ import { RouterModule } from '@angular/router';
 import { BreadcrumbsComponent } from './breadcrumbs/breadcrumbs.component';
 import { MatTableComponent } from './mat-table/mat-table.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { HeaderEntityComponent } from './header-entity/header-entity.component';
 
 
 @NgModule({
@@ -64,7 +65,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     SpinnerComponent,
     ToolbarComponent,
     BreadcrumbsComponent,
-    MatTableComponent
+    MatTableComponent,
+    HeaderEntityComponent
   ],
   imports: [
     CommonModule,
@@ -147,7 +149,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     SpinnerComponent,
     ToolbarComponent,
     BreadcrumbsComponent,
-    MatTableComponent
+    MatTableComponent,
+    HeaderEntityComponent
   ]
 })
 export class SharedModule { }

@@ -3,7 +3,6 @@
     <h3>Тести <span *ngIf="currentSubjectId">з предмета: {{ getSubjectNameById((this.route.params | async).id) }}</span></h3>
     <span class="fill-space"></span>
     <button mat-raised-button color="prime" (click)="openAddTestDialog()" aria-label="add">
-      <mat-icon aria-hidden="false" aria-label="add">add</mat-icon>
       Додати тест
     </button>
   </div>

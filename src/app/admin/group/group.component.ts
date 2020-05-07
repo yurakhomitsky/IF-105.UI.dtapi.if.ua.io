@@ -17,10 +17,11 @@ import { Router } from '@angular/router';
 import { Store, select, } from '@ngrx/store';
 import { AdminState } from '../store/MainReducer';
 import { loadGroups, groupUpdate, groupDelete, groupCreate } from '../store/group/group-actions';
-import { readyGroup, selectTotalGroups, } from '../store/group/group-selectors';
-import { distinctUntilChanged, take, takeUntil, tap } from 'rxjs/operators';
+import { selectTotalGroups, } from '../store/group/group-selectors';
+import { takeUntil } from 'rxjs/operators';
 import { selectAllSpecialities } from '../store/speciality/speciality-selectors';
 import { selectAllFaculties } from '../store/faculty/faculty-selectors';
+import { Colum, ActionButtonsBuilder, ActionButtonsClass } from 'src/app/shared/mat-table/mat-table.interface.builder';
 
 
 
@@ -34,7 +35,31 @@ import { selectAllFaculties } from '../store/faculty/faculty-selectors';
 export class GroupComponent implements OnInit, AfterViewInit, OnDestroy {
   arrayVisitedPages = new Set();
   visitedOffsets = new Set();
-
+  columns2 = [
+    new Colum('group_id', 'ID'),
+    new Colum('group_name', 'Шифр групи'),
+    new Colum('speciality', 'Спеціальність'),
+    new Colum('faculty', 'Факультет'),
+    new Colum('action', 'Дії',
+      [
+        new ActionButtonsBuilder()
+          .withType(tableActionsType.Route)
+          .withIcon('supervisor_account')
+          .withMatTooltip('Перейти до списку студентів')
+          .withAria_label('supervisor_account')
+          .withRoute('Students')
+          .build(),
+        new ActionButtonsBuilder()
+          .withType(tableActionsType.Route)
+          .withIcon('score')
+          .withMatTooltip('Перейти до результатів тестування')
+          .withAria_label('score')
+          .withRoute('results')
+          .build(),
+        new ActionButtonsBuilder().setDefaultButton('edit','Редагувати').build(),
+        new ActionButtonsBuilder().setDefaultButton('delete','Видалити').build(),
+      ])
+  ]
   columns: Column[] = [
     { columnDef: 'group_id', header: 'ID' },
     { columnDef: 'group_name', header: 'Шифр групи' },
@@ -95,9 +120,9 @@ export class GroupComponent implements OnInit, AfterViewInit, OnDestroy {
       .pipe(
         takeUntil(this.unsubscribe)
       ).subscribe((data) => {
-      this.listGroups = data;
-      this.listGroupsChunk = [...this.chunkArray(this.listGroups, this.currentPage, this.pageSize)];
-    })
+        this.listGroups = data;
+        this.listGroupsChunk = [...this.chunkArray(this.listGroups, this.currentPage, this.pageSize)];
+      })
 
     this.totalGroups$.subscribe((totalGroups) => this.total = totalGroups);
   }
@@ -134,7 +159,7 @@ export class GroupComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.checkVisitedOffset(this.validatePage(event.page) * event.pageSize, event.page)) {
       this.arrayVisitedPages.add(event.page);
       this.visitedOffsets.add(this.validatePage(event.page) * event.pageSize);
-      this.dispatchGroups(event.pageSize,event.offset);
+      this.dispatchGroups(event.pageSize, event.offset);
     } else {
       this.listGroupsChunk = [...this.chunkArray(this.listGroups, event.page, event.pageSize)];
     }
@@ -147,7 +172,7 @@ export class GroupComponent implements OnInit, AfterViewInit, OnDestroy {
       this.itemsCount = result.numberOfRecords;
     });
   }
-  checkVisitedOffset(offset: number,page: number) {
+  checkVisitedOffset(offset: number, page: number) {
     return (![...this.visitedOffsets].includes(offset) && !(this.total === this.itemsCount) && ![...this.arrayVisitedPages].includes(page))
   }
   checkVisitedPages(page: number, pageSize?: number) {
@@ -160,16 +185,16 @@ export class GroupComponent implements OnInit, AfterViewInit, OnDestroy {
     }));
   }
 
-  validatePage(page:number) {
+  validatePage(page: number) {
     let newpage = page === 0 ? 1 : page;
     if (page === 0) {
       newpage = 1;
     } else if (newpage === page) {
-      newpage+= 1
+      newpage += 1
     } else {
-      newpage-=1;
+      newpage -= 1;
     }
-    return  newpage
+    return newpage
   }
   chunkArray(groups: Group[], page: number, pageSize: number) {
     return this.groupService.chunkArray(groups, this.validatePage(page), pageSize);
@@ -179,8 +204,8 @@ export class GroupComponent implements OnInit, AfterViewInit, OnDestroy {
     combineLatest(
       this.store.select(selectAllFaculties),
       this.store.select(selectAllSpecialities),
-      (faculty,speciality) => [faculty,speciality]
-    ).subscribe(([faculty,speciality]: [[],[]]) => {
+      (faculty, speciality) => [faculty, speciality]
+    ).subscribe(([faculty, speciality]: [[], []]) => {
       this.listSpeciality = speciality;
       this.listFaculty = faculty;
     })
@@ -316,6 +341,6 @@ export class GroupComponent implements OnInit, AfterViewInit, OnDestroy {
     this.currentPage = 0;
     this.isCheckFaculty = false;
     this.isCheckSpeciality = false;
-    this.listGroupsChunk = this.chunkArray(this.listGroups,this.currentPage,this.pageSize);
+    this.listGroupsChunk = this.chunkArray(this.listGroups, this.currentPage, this.pageSize);
   }
 }

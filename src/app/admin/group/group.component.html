@@ -1,10 +1,5 @@
 <div class="container">
-  <div class="title-box">
-    <h3>Групи і студенти</h3>
-    <button mat-stroked-button color="prime" (click)="openAddGroupDialog()">
-      Додати групу
-    </button>
-  </div>
+  <app-header-entity [entityName]="'Групи'" [buttonName]="'групу'" (buttonClick)="openAddGroupDialog()"></app-header-entity>
   <div class="search-box">
     <button
       mat-stroked-button
@@ -42,7 +37,7 @@
 
     <app-mat-table 
     [data]="listGroupsChunk" 
-    [columns]="columns"  
+    [columns]="columns2"  
     [countRecords]="itemsCount"
     [filter]='true'
     [entity]="'Group'"
