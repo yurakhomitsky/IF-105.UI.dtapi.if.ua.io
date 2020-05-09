@@ -21,6 +21,7 @@ import { selectLoadedStudentsGroup, selectAllStudents, selectLoadingStudents } f
 import { tap, concatMap, map,  distinctUntilChanged, takeUntil, finalize } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
 import { checkIdsLoaded } from '../store/store-operators';
+import { UnSubscribeService } from 'src/app/shared/services/unsubsrice.service';
 
 @Component({
   selector: 'app-students',
@@ -36,7 +37,7 @@ export class StudentsComponent implements OnInit, AfterViewInit, OnDestroy {
   public displayedColumns: string[] = ['numeration', 'gradebookID', 'studentNSF', 'UpdateDelete'];
   public dataSource = new MatTableDataSource<Student>();
   students$: Observable<Student[]>;;
-  private unsubscribe = new Subject<void>();
+  private unsubscribe: Observable<void>;
   @ViewChild('table') table: MatTable<Element>;
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: false }) sort: MatSort;
@@ -47,16 +48,17 @@ export class StudentsComponent implements OnInit, AfterViewInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private modalService: ModalService,
     private matSnackBar: MatSnackBar,
-    private store: Store<AppState>
+    private store: Store<AppState>,
+    private unSubscribeService: UnSubscribeService
   ) { }
 
   ngOnInit() {
+    this.unsubscribe = this.unSubscribeService.unsubscribeP;
     this.groupdID = this.activatedRoute.snapshot.params['id'];
     this.fetchStudents()
       .pipe(
-        tap(() => { })
-      ).subscribe((students) => {
         takeUntil(this.unsubscribe)
+      ).subscribe((students) => {
         this.showStudentsByGroup(students);
       })
       this.dataSource.paginator = this.paginator;
@@ -68,20 +70,9 @@ export class StudentsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dataSource.sort = this.sort;
   }
   ngOnDestroy(): void {
-    this.unsubscribe.next();
-    this.unsubscribe.complete();
+    this.unSubscribeService.unSubscribe();
   }
   fetchStudents() {
-    // return this.store.select(selectLoadedStudentsGroup).pipe(
-    //   tap(groupsIds => {
-    //     if (!groupsIds.includes(+this.groupdID)) {
-    //       this.store.dispatch(loadStudents({ idGroup: this.groupdID }));
-    //     }
-    //   }),
-    //   concatMap(() => this.store.select(selectAllStudents)),
-    //   map((students) => students.filter((student) => +student.group_id === +this.groupdID)),
-    //   distinctUntilChanged(),
-    // )
     return this.store.select(selectLoadedStudentsGroup).pipe(
       checkIdsLoaded<Student>({
         id: +this.groupdID,

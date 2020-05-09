@@ -8,7 +8,7 @@ import { SafeResourceUrl } from '@angular/platform-browser';
 import { LangBtnService } from '../../shared/services/lang-btn.service';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/reducers';
-import { login } from '../store/login.action';
+import { login} from '../store/login.action';
 
 @Component({
   selector: 'app-login',

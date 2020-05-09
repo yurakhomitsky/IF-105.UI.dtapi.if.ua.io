@@ -14,7 +14,7 @@ import { ErrorResponse } from '../student.errors.response';
 import { Store, select } from '@ngrx/store';
 import { StudentState } from '../store/mainReducer';
 import { loadTimeTable } from '../store/studentTimeTable/studentTimeTable.actions';
-import { find, filter } from 'rxjs/operators';
+import { find, filter, tap } from 'rxjs/operators';
 import { selectTimeTableAndUserInfo, areTimeTableLoaded } from '../store/studentTimeTable/studentTimeTable.selectors';
 import { areDataLoaded } from 'src/app/admin/store/store-operators';
 

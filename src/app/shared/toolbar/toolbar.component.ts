@@ -1,7 +1,7 @@
 import {Component, OnInit, Input } from '@angular/core';
-import { Observable, from } from 'rxjs';
+import { Observable, from, Subject } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { map, shareReplay } from 'rxjs/operators';
+import { map, shareReplay, finalize } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -15,6 +15,7 @@ import { Store, select } from '@ngrx/store';
 import { AppState } from 'src/app/reducers';
 import { selectUserData } from 'src/app/login/store/login.selectors';
 import { logout } from 'src/app/login/store/login.action';
+import { UnSubscribeService } from '../services/unsubsrice.service';
 
 @Component({
   selector: 'app-toolbar',
@@ -25,7 +26,6 @@ export class ToolbarComponent implements OnInit {
   @Input() sidenav: MatSidenav;
   currentUser$: Observable<any>;
   user: UserLogin;
-
   constructor(
     private breakpointObserver: BreakpointObserver,
     private router: Router,
@@ -34,6 +34,7 @@ export class ToolbarComponent implements OnInit {
     private modalService: ModalService,
     private testLogoutService: TestLogoutService,
     private langBtnService: LangBtnService,
+    private unSubscribeService: UnSubscribeService,
     private store: Store<AppState>
   ) { }
 
@@ -62,6 +63,7 @@ export class ToolbarComponent implements OnInit {
     this.authService.logout()
       .subscribe(() => {
         this.router.navigate(['login']);
+        this.unSubscribeService.unSubscribe();
         this.store.dispatch(logout());
       });
 

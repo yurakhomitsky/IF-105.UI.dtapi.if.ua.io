@@ -1,6 +1,6 @@
 import { Test } from 'src/app/shared/entity.interface';
 import { EntityState, createEntityAdapter } from '@ngrx/entity';
-import { createReducer, on } from '@ngrx/store';
+import { createReducer, on, Action } from '@ngrx/store';
 import TestsActions from './tests-types';
 
 
@@ -38,5 +38,7 @@ export const testsReducer = createReducer(
     on(TestsActions.testError, (state, action) => ({ ...state, loading: false, noRecords: action.failed }))
 );
 
-
+export function testReducer(state: TestState | undefined, action: Action) {
+    return  testsReducer(state, action);
+  }
 export const { selectAll: selectTests } = adapter.getSelectors();

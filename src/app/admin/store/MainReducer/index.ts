@@ -37,7 +37,7 @@ export const reducers: ActionReducerMap<AdminState> = {
     group: fromGroup.groupsReducer,
     student: fromStudent.studentsReducer,
     subject: fromSubject.subjectReducer,
-    test: fromTest.testsReducer,
+    test: fromTest.testReducer,
 
 }
 

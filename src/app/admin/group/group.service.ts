@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Speciality, Faculty, Group } from '../../shared/entity.interface';
 import { ApiService } from 'src/app/shared/services/api.service';
 import { ModalService } from '../../shared/services/modal.service';
@@ -7,7 +7,7 @@ import { AppState } from 'src/app/reducers';
 import { Store, select } from '@ngrx/store';
 import { selectAllFaculties, areFacultiesLoaded } from '../store/faculty/faculty-selectors';
 import { selectAllSpecialities, areSpecialitiesLoaded } from '../store/speciality/speciality-selectors';
-import { filter, map, tap, switchMap, share, first, withLatestFrom, distinctUntilChanged, concatMap } from 'rxjs/operators';
+import { filter, map, tap, switchMap, share, first, withLatestFrom, distinctUntilChanged, concatMap, take } from 'rxjs/operators';
 import { loadAllFaculties } from '../store/faculty/faculty-actions';
 import { loadAllSpecialities } from '../store/speciality/speciality-actions';
 import { readyGroup, selectAllGroups, selectLoadingGroups } from '../store/group/group-selectors';
@@ -15,8 +15,7 @@ import { readyGroup, selectAllGroups, selectLoadingGroups } from '../store/group
 @Injectable({
   providedIn: 'root'
 })
-export class GroupService {
-
+export class GroupService  {
   getBothEntityLoaded$ = combineLatest(
     this.store.select(areSpecialitiesLoaded).pipe(tap((hasloaded) => {
       if(!hasloaded) {
@@ -33,7 +32,8 @@ export class GroupService {
       return faculty && speciality && !groups;
     }
   ).pipe(
-    filter((hasLoaded) => hasLoaded)
+    filter((hasLoaded) => hasLoaded),
+    first()
   )
 
 
@@ -54,7 +54,6 @@ export class GroupService {
   chunkArray(groups:Group[],page?:number,pageSize?:number) {
     return groups.slice((page -1) * pageSize, page * pageSize);
   }
-
   getGroups() {
     return this.getBothEntityLoaded$.pipe(
       switchMap((data) =>  {

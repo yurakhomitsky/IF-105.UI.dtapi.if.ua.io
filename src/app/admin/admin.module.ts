@@ -57,8 +57,8 @@ import { AboutUsComponent } from './about-us/about-us.component';
 import { DoughnutChartComponent } from './about-us/doughnut-chart/doughnut-chart.component';
 import { BarsChartComponent } from './about-us/bars-chart/bars-chart.component';
 import { ProtocolComponent } from './protocol/protocol.component';
-import { StoreModule } from '@ngrx/store';
-import { reducers } from './store/MainReducer';
+import { StoreModule, ActionReducer, Action } from '@ngrx/store';
+import { reducers, AdminState, initialAdminState } from './store/MainReducer';
 import { EffectsModule } from '@ngrx/effects';
 import { FacultyEffects } from './store/faculty/faculty-effects';
 import { SpecialityEffects } from './store/speciality/speciality-effects';
@@ -68,6 +68,7 @@ import { SubjectEffects } from './store/subject/subject-effects';
 import { SubjectResolver } from './subjects/subjects.resolver';
 import { TestEffects } from './store/tests/tests-effects';
 import { TestsResolver } from './tests/test.resolver';
+import { AppState } from '../reducers';
 
 
 
@@ -243,7 +244,7 @@ const routes: Routes = [
       }
     }),
     ChartsModule,
-    StoreModule.forFeature('admin', reducers),
+    StoreModule.forFeature('admin', reducers, { initialState: initialAdminState, metaReducers: []}),
     EffectsModule.forFeature([FacultyEffects, SpecialityEffects, GroupEffects, StudentEffects, SubjectEffects, TestEffects])
   ],
   providers: [
@@ -287,4 +288,13 @@ export class AdminModule { }
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
+}
+function clearState(reducer: ActionReducer<AdminState>): ActionReducer<AdminState> {
+  return (state: AdminState, action: Action): AdminState => {
+    if (action.type === '[Toolbar] User Logout') {
+      state = undefined
+      return reducer(state, action);
+    }
+    return reducer(state, action);
+  };
 }

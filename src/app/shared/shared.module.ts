@@ -56,6 +56,7 @@ import { BreadcrumbsComponent } from './breadcrumbs/breadcrumbs.component';
 import { MatTableComponent } from './mat-table/mat-table.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { HeaderEntityComponent } from './header-entity/header-entity.component';
+import { UnSubscribeService } from './services/unsubsrice.service';
 
 
 @NgModule({
@@ -96,7 +97,8 @@ import { HeaderEntityComponent } from './header-entity/header-entity.component';
   ],
   providers: [
     AuthService,
-    ModalService
+    ModalService,
+    UnSubscribeService
   ],
   entryComponents: [
     ConfirmComponent,

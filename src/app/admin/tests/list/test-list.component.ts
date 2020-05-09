@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild, Inject} from '@angular/core';
+import {Component, OnInit, ViewChild, Inject, OnDestroy, AfterViewInit} from '@angular/core';
 import { Subject } from '../../entity.interface';
 import { Test } from 'src/app/shared/entity.interface';
 import { MatTableDataSource, MatTable } from '@angular/material/table';
@@ -14,8 +14,11 @@ import { Store, select } from '@ngrx/store';
 import { AdminState } from '../../store/MainReducer';
 import { loadTests, testCreate, testUpdate, testDelete } from '../../store/tests/tests-actions';
 import { selectAllTests, selectLoadedTestSubject } from '../../store/tests/tests-selectors';
-import { tap, switchMap, map, distinctUntilChanged, filter } from 'rxjs/operators';
+import { tap, switchMap, map, distinctUntilChanged, filter, takeUntil } from 'rxjs/operators';
 import { selectAllSubject } from '../../store/subject/subject-selectors';
+import { Subject as SubjectRxJs, Observable } from 'rxjs';
+import { ToolbarComponent } from 'src/app/shared/toolbar/toolbar.component';
+import { UnSubscribeService } from 'src/app/shared/services/unsubsrice.service';
 
 
 @Component({
@@ -23,7 +26,7 @@ import { selectAllSubject } from '../../store/subject/subject-selectors';
   templateUrl: './test-list.component.html',
   styleUrls: ['./test-list.component.scss'],
 })
-export class TestListComponent implements OnInit {
+export class TestListComponent implements OnInit, OnDestroy {
   currentSubjectId: number;
   listTests: Test[] = [];
   listSubjects: Subject[] = [];
@@ -39,6 +42,7 @@ export class TestListComponent implements OnInit {
 
   @ViewChild('table', {static: true}) table: MatTable<Test>;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  private unsubscribe: Observable<void>;
 
   constructor(
     public dialog: MatDialog,
@@ -47,15 +51,18 @@ export class TestListComponent implements OnInit {
     public route: ActivatedRoute,
     private router: Router,
     private exportService: ExportService,
-    private store: Store<AdminState>
+    private store: Store<AdminState>,
+    private unSubscribeService: UnSubscribeService
   ) {}
 
   ngOnInit() {
+    this.unsubscribe = this.unSubscribeService.unsubscribeP;
     this.route.params.pipe(
       tap((params: Params) => {
         this.currentSubjectId = +params.id;
       }),
-      switchMap(() => this.fetchTests())
+      switchMap(() => this.fetchTests()),
+      takeUntil(this.unsubscribe),
     ).
     subscribe((tests) => {
       this.listTests = tests;
@@ -66,17 +73,21 @@ export class TestListComponent implements OnInit {
       this.listSubjects = subjects
     });
   }
+
+  ngOnDestroy() {
+    this.unSubscribeService.unSubscribe();
+  }
   fetchTests() {
    return this.store.pipe(
       select(selectLoadedTestSubject),
       tap((subjecIds) => {
-        if (!subjecIds.includes(this.currentSubjectId))
+        if (!subjecIds.includes(this.currentSubjectId)) {
         this.store.dispatch(loadTests({subjectId: +this.currentSubjectId}))
+        }
       }),
       switchMap(() => this.store.select(selectAllTests)),
-      filter((tests) => tests.length > 0),
-      map((tests) => tests.filter((test) => +test.subject_id === +this.currentSubjectId)),
       distinctUntilChanged(),
+      map((tests) => tests.filter((test) => +test.subject_id === +this.currentSubjectId)),
     )
   }
 
@@ -158,7 +169,6 @@ export class TestListComponent implements OnInit {
   }
 
   private editTest(test: Test): void {
-    console.log(test);
     this.apiService.updEntity('test', test, test.test_id).subscribe((data) => {
       this.store.dispatch(testUpdate({update: {
         id: test.test_id,
