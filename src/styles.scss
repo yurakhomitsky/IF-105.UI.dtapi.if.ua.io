@@ -1,6 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 @import "~ng-pick-datetime/assets/style/picker.min.css";
-@import '~@angular/material/theming';
+@import "~@angular/material/theming";
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 
 html,
@@ -12,9 +12,9 @@ body {
   background-color: #fcfcfc;
 }
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 .student-view-dialog-container .mat-dialog-container {
@@ -23,4 +23,27 @@ body {
 
 html {
   scroll-behavior: smooth;
+}
+.snackbar {
+  &-success {
+    background-color: #509650;
+  }
+  &-alert {
+    background-color: #b34045;
+  }
+  &-warning {
+    background-color: #f8b344;
+  }
+  &-info {
+    background-color: #3e72ad;
+  }
+}
+
+.mat-simple-snackbar {
+  justify-content: space-around !important;
+  font-size: 1rem;
+  color: white;
+}
+.mat-simple-snackbar-action {
+  color: black;
 }

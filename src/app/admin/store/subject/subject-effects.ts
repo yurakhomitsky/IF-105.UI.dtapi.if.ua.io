@@ -16,7 +16,7 @@ export class SubjectEffects {
                    return this.apiService.getEntity('Subject').pipe(
                         map(data => SubjectAction.allSubjectsLoaded({ subjects: data })),
                         catchError(() => {
-                            this.modalService.openSnackBar('Не вдалося виконати запит');
+                            this.modalService.openSnackBar('Не вдалося виконати запит','alert');
                           return  EMPTY;
                         })
                         )}
@@ -24,27 +24,6 @@ export class SubjectEffects {
 
         );
     });
-
-    // saveSubject$ = createEffect(() => {
-    //     return this.actions$.pipe(
-    //             ofType(SubjectAction.subjectUpdate),
-    //             concatMap((action) =>
-    //             this.apiService.updEntity('Subject',action.update.changes,+action.update.id)
-    //                 .pipe(
-    //                     tap(() => this.modalService.openSnackBar('Предмет оновлено')),
-    //                     catchError((err) => {
-    //                         if (err.error.response.includes('Error when update')) {
-    //                             this.modalService.openSnackBar('Інформація про Предмет не змінювалась');
-    //                             return EMPTY;
-    //                         }
-
-    //                     })
-    //                 )
-    //             )
-    //     )
-    // }, {dispatch: false});
-
-
 
     constructor(private actions$: Actions,
                 private modalService: ModalService,

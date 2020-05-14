@@ -190,6 +190,7 @@ export class NewQuestionComponent implements OnInit {
       .subscribe(() => {
         // this.router.navigate([`admin/subjects/tests/${this.testId}/questions`])
         this.router.navigate(['../'], { relativeTo: this.route});
+        this.modalService.openSnackBar('Питання успішно створено','success');
       });
   }
 
@@ -228,7 +229,7 @@ export class NewQuestionComponent implements OnInit {
         })
       )
       .subscribe(() => {
-        this.modalService.openSnackBar('Питання успішно оновлене');
+        this.modalService.openSnackBar('Питання успішно оновлене','success');
         this.router.navigate(['../../'], { relativeTo: this.route});
         // this.router.navigate([`${this.testId}`,'questions'], { relativeTo: this.route.parent.parent});
         // this.router.navigate([`admin/subjects/tests/${this.testId}/questions`])
@@ -237,7 +238,7 @@ export class NewQuestionComponent implements OnInit {
     if (answersToUpdate && !questionToUpdate) {
       this.questionService.updateAnswerCollection( answers, this.questionId)
         .subscribe(() => {
-          this.modalService.openSnackBar('Питання успішно оновлене');
+          this.modalService.openSnackBar('Питання успішно оновлене','success');
           this.router.navigate(['../../'], { relativeTo: this.route});
           // this.router.navigate([`${this.testId}`,'questions'], { relativeTo: this.route.parent.parent});
           // this.router.navigate([`admin/subjects/tests/${this.testId}/questions`])
@@ -332,7 +333,6 @@ export class NewQuestionComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log(this.route.parent);
     if (this.route.snapshot.paramMap.get('mode') === 'edit') {
       this.editMode = true;
       this.questionId = +this.route.snapshot.paramMap.get('questionId');

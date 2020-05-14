@@ -88,9 +88,7 @@ export class FacultiesComponent  implements OnInit, AfterViewInit {
     this.facultyService.createFaculty(faculty)
       .subscribe(([response]) => {
         this.store.dispatch(facultyCreate({create: response}));
-        // this.mattable.getRange(data => this.faculties = data);
-        // this.length++;
-        this.openSnackBar('Факультет додано');
+        this.modalService.openSnackBar('Факультет додано','success');
       },
         err => {
           if (err.error.response.includes('Duplicate')) {
@@ -135,9 +133,8 @@ export class FacultiesComponent  implements OnInit, AfterViewInit {
     this.facultyService.deleteFaculty(id)
       .subscribe(() => {
         this.store.dispatch(facultyDelete({id}));
-      //  this.faculties = this.faculties.filter(item => item.faculty_id !== id);
-       this.openSnackBar('Факультет видалено');
-      //  if (this.faculties.length > 0) { this.length--; }
+       this.modalService.openSnackBar('Факультет видалено','success');
+
       },
         err => {
           if (err.error.response.includes('Cannot delete')) {
@@ -146,10 +143,5 @@ export class FacultiesComponent  implements OnInit, AfterViewInit {
             this.modalService.openErrorModal('Помилка видалення');
           }
         });
-  }
-  openSnackBar(message: string, action?: string) {
-    this.snackBar.open(message, action, {
-      duration: 2500,
-    });
   }
 }

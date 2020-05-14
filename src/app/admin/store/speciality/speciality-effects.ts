@@ -33,10 +33,10 @@ export class SpecialityEffects {
                 concatMap((action) =>
                 this.apiService.updEntity('Speciality',action.update.changes,+action.update.id,)
                     .pipe(
-                        tap(() => this.modalService.openSnackBar('Спеціальність оновлено')),
+                        tap(() => this.modalService.openSnackBar('Спеціальність оновлено','success')),
                         catchError((err) => {
                             if (err.error.response.includes('Error when update')) {
-                                this.modalService.openSnackBar('Інформація про спеціальність не змінювалась');
+                                this.modalService.openSnackBar('Інформація про спеціальність не змінювалась','info');
                                 return EMPTY;
                             }
 

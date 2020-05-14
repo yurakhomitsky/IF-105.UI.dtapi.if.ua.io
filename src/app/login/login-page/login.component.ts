@@ -68,7 +68,6 @@ export class LoginComponent implements OnInit {
     return faculty.find((item) => item.id === id);
   }
   login() {
-    console.log(this.loginForm.value);
     const {loginUser: username, password} = this.loginForm.value;
     this.authService
       .login({ username,password })

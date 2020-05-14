@@ -103,7 +103,6 @@ export class TimeTableComponent implements OnInit {
         let groupName: string;
         this.apiService.getEntity('Group', result.group_id).subscribe((group: Group[]) => {
           groupName = group[0].group_name;
-          // this.editTimeTable(result, groupName);
           this.editTimeTable(result, groupName);
         });
       }
@@ -176,6 +175,7 @@ export class TimeTableComponent implements OnInit {
       })
     ).subscribe(() => {
       this.dataSource.data.push(updatedTable[0]);
+      this.modalService.openSnackBar('Успішно додано','success');
       this.table.renderRows();
       this.dataSource.paginator = this.paginator;
     },
@@ -206,6 +206,7 @@ export class TimeTableComponent implements OnInit {
           result[0].group_name = groupName;
           this.timeTable[index] = result[0];
           this.dataSource.data[index] = result[0];
+          this.modalService.openSnackBar('Успішно оновлено','success');
           this.table.renderRows();
           this.dataSource.paginator = this.paginator;
         }
@@ -225,6 +226,7 @@ export class TimeTableComponent implements OnInit {
   private deleteTimeTable(data: TimeTable) {
     this.apiService.delEntity('timeTable', data.timetable_id).subscribe((result: any) => {
       if (result) {
+        this.modalService.openSnackBar('Успішно видалено','success');
         this.timeTable = this.timeTable.filter(tt => tt.timetable_id !== data.timetable_id);
         this.dataSource.data = this.timeTable;
         this.table.renderRows();

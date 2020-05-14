@@ -35,31 +35,6 @@ import { Colum, ActionButtonsBuilder, ActionButtonsClass } from 'src/app/shared/
 export class GroupComponent implements OnInit, AfterViewInit, OnDestroy {
   arrayVisitedPages = new Set();
   visitedOffsets = new Set();
-  columns2 = [
-    new Colum('group_id', 'ID'),
-    new Colum('group_name', 'Шифр групи'),
-    new Colum('speciality', 'Спеціальність'),
-    new Colum('faculty', 'Факультет'),
-    new Colum('action', 'Дії',
-      [
-        new ActionButtonsBuilder()
-          .withType(tableActionsType.Route)
-          .withIcon('supervisor_account')
-          .withMatTooltip('Перейти до списку студентів')
-          .withAria_label('supervisor_account')
-          .withRoute('Students')
-          .build(),
-        new ActionButtonsBuilder()
-          .withType(tableActionsType.Route)
-          .withIcon('score')
-          .withMatTooltip('Перейти до результатів тестування')
-          .withAria_label('score')
-          .withRoute('results')
-          .build(),
-        new ActionButtonsBuilder().setDefaultButton('edit','Редагувати').build(),
-        new ActionButtonsBuilder().setDefaultButton('delete','Видалити').build(),
-      ])
-  ]
   columns: Column[] = [
     { columnDef: 'group_id', header: 'ID' },
     { columnDef: 'group_name', header: 'Шифр групи' },
@@ -226,12 +201,15 @@ export class GroupComponent implements OnInit, AfterViewInit, OnDestroy {
   /** Add new group */
   addGroup(group: Group) {
     this.apiService.createEntity('Group', group).subscribe(([result]) => {
-      this.openSnackBar(`Групу ${group.group_name} успішно додано`);
+      this.modalService.openSnackBar(`Групу ${group.group_name} успішно додано`,'success');
       this.getCountRecords('group');
       this.store.dispatch(groupCreate({ create: result }));
     }, (error: any) => {
       if (error.error.response.includes('Duplicate')) {
         this.modalService.openErrorModal(`Група "${group.group_name}" вже існує`);
+      }
+      if (error.error.response.includes('Data too long')) {
+        this.modalService.openErrorModal(`Занадто велике імя для групи`);
       }
     });
   }
@@ -246,7 +224,7 @@ export class GroupComponent implements OnInit, AfterViewInit, OnDestroy {
     this.apiService.delEntity('Group', group.group_id).subscribe((result: any) => {
       if (result) {
         this.store.dispatch(groupDelete({ id: group.group_id }));
-        this.openSnackBar(`Групу ${group.group_name} успішно виделено`);
+        this.modalService.openSnackBar(`Групу ${group.group_name} успішно виделено`,'success');
         this.getCountRecords('group');
       }
     }, (error: any) => {

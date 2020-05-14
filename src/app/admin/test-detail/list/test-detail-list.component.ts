@@ -164,6 +164,7 @@ export class TestDetailListComponent implements OnInit {
 
   private addTestDetail(testDetail: TestDetail) {
     this.apiService.createEntity('TestDetail', testDetail).subscribe((result: TestDetail[]) => {
+      this.modalService.openSnackBar('Успішно додано','success');
       this.listTestsDetails.push(result[0]);
       this.dataSource.data = this.listTestsDetails;
       this.listTestsDetailsRatesSum = this.getRatesSumForCurrentTest();
@@ -174,6 +175,7 @@ export class TestDetailListComponent implements OnInit {
 
   private editTest(testDetail: TestDetail): void {
     this.apiService.updEntity('TestDetail', testDetail, testDetail.id).subscribe(() => {
+      this.modalService.openSnackBar('Успішно оновлено','success');
       this.dataSource.data = this.listTestsDetails;
       this.listTestsDetailsRatesSum = this.getRatesSumForCurrentTest();
     }, (error: any) => {

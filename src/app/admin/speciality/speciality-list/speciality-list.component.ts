@@ -54,7 +54,7 @@ export class SpecialityListComponent implements OnInit, AfterViewInit {
       .subscribe((data) => {
         this.store.dispatch(specialityDelete({id: obj.speciality_id}));
         // this.dataSource.data = this.dataSource.data.filter(speciality => speciality.speciality_id !== obj.speciality_id);
-        this.openSnackBar('Спеціальність ' + obj.speciality_name + ' була успішно видалена');
+        this.modalService.openSnackBar('Спеціальність ' + obj.speciality_name + ' була успішно видалена','success');
       },  err => {
         if (err.error.response.includes('Cannot delete')) {
           this.modalService.openInfoModal('Неможливо видалити спеціальність. Потрібно видалити групу цієї спеціальності');
@@ -71,12 +71,12 @@ export class SpecialityListComponent implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe(data => {
       if (data) {
         return this.apiService.createEntity('Speciality', data).subscribe((obj: Speciality) => {
-          this.openSnackBar('Спеціальність ' + data.speciality_name + ' була успішно створена');
+          this.modalService.openSnackBar('Спеціальність ' + data.speciality_name + ' була успішно створена','success');
           this.store.dispatch(specialityCreate({create: obj[0]}));
           // this.dataSource.data = [...this.dataSource.data, obj[0]];
           // this.table.renderRows();
         }, err => {
-          this.openSnackBar(err.error.response);
+          this.modalService.openSnackBar('Помилка при додаванні','alert');
         }
         );
       }

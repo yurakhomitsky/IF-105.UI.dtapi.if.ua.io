@@ -57,6 +57,7 @@ export class QuestionsComponent implements OnInit {
           switchMap(() => this.questionService.deleteQuestion(id)),
         )
         .subscribe(() => {
+          this.modalService.openSnackBar('Питання успішно видалено','success');
             const offset = this.pageSize * this.currentPage;
             this.getQuestions(offset);
             this.getQuestionsCount();

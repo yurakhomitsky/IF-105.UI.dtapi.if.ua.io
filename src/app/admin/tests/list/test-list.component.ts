@@ -163,13 +163,18 @@ export class TestListComponent implements OnInit, OnDestroy {
   private addTest(test: Test) {
     this.apiService.createEntity('test', test).subscribe((result: Test[]) => {
       this.store.dispatch(testCreate({create: result[0]}))
+      this.modalService.openSnackBar('Успішно додано','success');
       this.table.renderRows();
       this.dataSource.paginator = this.paginator;
+    },
+    () => {
+      this.modalService.openSnackBar('Помилка при додаванні','alert');
     });
   }
 
   private editTest(test: Test): void {
     this.apiService.updEntity('test', test, test.test_id).subscribe((data) => {
+      this.modalService.openSnackBar('Успішно оновлено','success');
       this.store.dispatch(testUpdate({update: {
         id: test.test_id,
         changes: test

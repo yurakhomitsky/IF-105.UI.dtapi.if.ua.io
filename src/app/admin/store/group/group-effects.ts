@@ -31,14 +31,14 @@ export class GroupEffects {
                 concatMap((action) =>
                 this.apiService.updEntity('group',action.update.changes, +action.update.id)
                     .pipe(
-                        tap(() => this.modalService.openSnackBar('Групу оновлено')),
+                        tap(() => this.modalService.openSnackBar('Групу оновлено','success')),
                         catchError((err) => {
                             if (err.error.response.includes('Error when update')) {
-                                this.modalService.openSnackBar('Інформація про групу не змінювалась');
+                                this.modalService.openSnackBar('Інформація про групу не змінювалась','info');
                                 return EMPTY;
                             }
                             else {
-                                this.modalService.openErrorModal('Помилка оновлення');
+                                this.modalService.openSnackBar('Помилка оновлення','success');
                                 return EMPTY;
                              }
 

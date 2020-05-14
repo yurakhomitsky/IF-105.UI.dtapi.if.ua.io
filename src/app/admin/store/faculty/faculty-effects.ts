@@ -34,10 +34,10 @@ export class FacultyEffects {
                 concatMap((action) =>
                 this.facultyService.updateFaculty(+action.update.id, action.update.changes)
                     .pipe(
-                        tap(() => this.modalService.openSnackBar('Факультет оновлено')),
+                        tap(() => this.modalService.openSnackBar('Факультет оновлено','success')),
                         catchError((err) => {
                             if (err.error.response.includes('Error when update')) {
-                                this.modalService.openSnackBar('Інформація про факультет не змінювалась');
+                                this.modalService.openSnackBar('Інформація про факультет не змінювалась','info');
                                 return EMPTY;
                             }
 

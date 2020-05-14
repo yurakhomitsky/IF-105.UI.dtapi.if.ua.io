@@ -19,7 +19,7 @@ export class TimeTableEffects {
                                     timetable: this.studentInfoService.formDataSource(timeTableArray,testArray)})
                         }),
                         catchError(() => {
-                           this.modalService.openSnackBar('Помилка завантаження даних');
+                           this.modalService.openSnackBar('Помилка завантаження даних','alert');
                            return EMPTY;
                         })
                         )}

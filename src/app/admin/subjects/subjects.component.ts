@@ -128,7 +128,7 @@ export class SubjectsComponent implements OnInit, OnDestroy {
         if (newData) {
           this.store.dispatch(subjectCreate({create: newData[0]}))
           // this.dataSource.data = [...this.dataSource.data, newData[0]];
-          this.translateSnackBar('subjects.snackbarMessageCreate', 'X');
+          this.modalService.openSnackBar('Предмет успішно додано','success');
         }
       },
       err => {
@@ -162,7 +162,7 @@ export class SubjectsComponent implements OnInit, OnDestroy {
               changes: body
             }
           }))
-          this.translateSnackBar('subjects.snackbarMessageEdit', 'X');
+          this.modalService.openSnackBar('Предмет успішно оновлено','success');
         }
       });
   }
@@ -177,8 +177,9 @@ export class SubjectsComponent implements OnInit, OnDestroy {
     this.apiService.delEntity('Subject', id)
       .subscribe((response) => {
         this.store.dispatch(subjectDelete({id}));
-        this.translateSnackBar('subjects.snackbarMessageDelete', 'X');
-      });
+        this.modalService.openSnackBar('Предмет успішно видалено','success');
+      },
+      () => this.modalService.openSnackBar('Помилка при видаленні','alert'));
   }
 
   navigateToTimeTable(subjectId) {

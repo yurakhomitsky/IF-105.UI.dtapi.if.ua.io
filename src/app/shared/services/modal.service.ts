@@ -35,9 +35,10 @@ export class ModalService {
     this.openAlertModal(message, 'Помилка', 'error');
   }
 
-  openSnackBar(message: string, action?: string) {
+  openSnackBar(message: string, type: string, action: string = 'Закрити') {
     this.snackBar.open(message, action, {
       duration: 2500,
+      panelClass: [`snackbar-${type}`]
     });
   }
   constructor( public dialog: MatDialog, private snackBar: MatSnackBar) { }
