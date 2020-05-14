@@ -82,6 +82,12 @@
           {{ result.score }}
         </td>
       </ng-container>
+      <ng-container matColumnDef="twenty">
+        <th mat-header-cell *matHeaderCellDef>12 бальна</th>
+        <td mat-cell *matCellDef="let result">
+          {{ result.twenty }}
+        </td>
+      </ng-container>
       <ng-container matColumnDef="session_date">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Дата</th>
         <td mat-cell *matCellDef="let result">{{ result.session_date }}</td>

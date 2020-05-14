@@ -38,6 +38,7 @@ export class ResultsComponent implements OnInit {
     'student',
     'result',
     'score',
+    'twenty',
     'session_date',
     'start_time',
     'duration',
@@ -144,9 +145,11 @@ export class ResultsComponent implements OnInit {
       this.listResults = res2.map(item => {
         const duration = this.resultsService.getDurationTest(item.session_date, item.start_time, item.end_time);
         const score = (item.result / item.answers * 100).toFixed();
+        const twenty = (item.result / item.answers * 12).toFixed();
         const student = this.resultsService.getFullNameStudent(item.student_id, res1);
-        return { ...item, student, duration, score };
+        return { ...item, student, duration, score, twenty };
       });
+      console.log(this.listResults);
       this.dataSource.data = this.listResults;
       this.dataSource.sort = this.sort;
     }, () => {

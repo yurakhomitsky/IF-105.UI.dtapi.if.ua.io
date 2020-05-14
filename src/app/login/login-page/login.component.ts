@@ -8,7 +8,8 @@ import { SafeResourceUrl } from '@angular/platform-browser';
 import { LangBtnService } from '../../shared/services/lang-btn.service';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/reducers';
-import { login} from '../store/login.action';
+import { login } from '../store/login.action';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +17,10 @@ import { login} from '../store/login.action';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
+
+  loginForm: FormGroup;
+  loginUser: FormControl;
+  password: FormControl;
 
   public userData: { username: string; password: string; } = { username: null, password: null };
   public error = null;
@@ -31,41 +36,55 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
     this.getLogo();
+    this.createFormControls();
+    this.createForm();
   }
-
+  createFormControls() {
+    this.loginUser = new FormControl('', Validators.required);
+    this.password = new FormControl('', Validators.required);
+  }
+  createForm() {
+    this.loginForm = new FormGroup({
+      loginUser: this.loginUser,
+      password: this.password
+    })
+    this.loginForm.valueChanges.subscribe(() => this.error = null);
+  }
   getLogo() {
     this.loginService.getLogo()
       .subscribe(data => this.logo = data);
   }
   finder(groups, faculties) {
-   return groups.map((item) => {
-      const faculty = this.findFacultyById(faculties,item.faculty_id);
+    return groups.map((item) => {
+      const faculty = this.findFacultyById(faculties, item.faculty_id);
       return {
         ...item,
         fack: faculty.name
       }
     });
 
-    }
-  findFacultyById(faculty: Array<any>,id: number) {
-   return faculty.find((item) => item.id === id);
+  }
+  findFacultyById(faculty: Array<any>, id: number) {
+    return faculty.find((item) => item.id === id);
   }
   login() {
+    console.log(this.loginForm.value);
+    const {loginUser: username, password} = this.loginForm.value;
     this.authService
-      .login(this.userData)
-        .subscribe((response: any) => {
-          const {id, username, roles} = response;
-          this.error = null;
+      .login({ username,password })
+      .subscribe((response: any) => {
+        const { id, username, roles } = response;
+        this.error = null;
 
-          this.store.dispatch(login({user: {id, username, roles}}));
+        this.store.dispatch(login({ user: { id, username, roles } }));
 
-          const navigateTo = response.roles.includes('admin') ? 'admin' : 'student';
-          this.router.navigate([navigateTo]);
-        }, ({error}) => {
-          this.userData.username = null;
-          this.userData.password = null;
-          this.error = 'Не вірний пароль або логін';
-        });
+        const navigateTo = response.roles.includes('admin') ? 'admin' : 'student';
+        this.router.navigate([navigateTo]);
+      }, ({ error }) => {
+        this.userData.username = null;
+        this.userData.password = null;
+        this.error = 'Не вірний пароль або логін';
+      });
   }
   changeLang(language: string) {
     this.langBtnService.switchLanguage(language);

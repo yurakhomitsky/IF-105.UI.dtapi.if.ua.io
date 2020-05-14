@@ -6,13 +6,16 @@ import {ModalService} from '../../shared/services/modal.service';
 import {Test} from '../../admin/entity.interface';
 import {SessionStorageService} from 'angular-web-storage';
 import {TestLogoutService} from '../../shared/services/test-logout.service';
+import { UnSubscribeService } from 'src/app/shared/services/unsubsrice.service';
 
 @Component({
   selector: 'app-test-player',
   templateUrl: './test-player.component.html',
-  styleUrls: ['./test-player.component.scss']
+  styleUrls: ['./test-player.component.scss'],
+  providers: [UnSubscribeService],
 })
 export class TestPlayerComponent implements OnInit, OnDestroy {
+  // tslint:disable-next-line:max-line-length
   public questions: { 'question_id': string; 'test_id': string; 'question_text': string; 'level': string; 'type': string; 'attachment': string; }[];
   public index: number;
   public choosenQuestionId: string;
@@ -95,6 +98,7 @@ export class TestPlayerComponent implements OnInit, OnDestroy {
   }
 
   sendAnswersForCheck() {
+    clearInterval(this.testInProgress);
     const testDataForCheck = this.addedQuestionAnswer.map(item => {
       if (typeof item.answer === 'string' || typeof item.answer === 'number') {
         return {question_id: item.question, answer_ids: [item.answer]};

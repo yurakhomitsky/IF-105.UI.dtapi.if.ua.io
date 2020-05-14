@@ -1,9 +1,9 @@
-import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {Faculty, Group, Speciality, StudentInfo, TimeTable, TestsForStudent} from '../shared/entity.interface';
-import {concatMap, map, switchMap} from 'rxjs/operators';
-import {Subject, Test} from '../admin/entity.interface';
-import {AuthService} from '../shared/auth.service';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Faculty, Group, Speciality, StudentInfo, TimeTable, TestsForStudent } from '../shared/entity.interface';
+import { concatMap, map, switchMap } from 'rxjs/operators';
+import { Subject, Test } from '../admin/entity.interface';
+import { AuthService } from '../shared/auth.service';
 
 
 @Injectable({
@@ -12,11 +12,11 @@ import {AuthService} from '../shared/auth.service';
 export class StudentInfoService {
 
   constructor(private http: HttpClient,
-              private authService: AuthService) {
+    private authService: AuthService) {
   }
 
   getUserData() {
-    return  this.authService.getCurrentUser().pipe(
+    return this.authService.getCurrentUser().pipe(
       switchMap(user => {
         return this.getData(user.id);
       })
@@ -75,23 +75,23 @@ export class StudentInfoService {
       })
     );
   }
-   formDataSource(timeTableArray: TestsForStudent[], testArray: Test[]) {
+  formDataSource(timeTableArray: TestsForStudent[], testArray: Test[]) {
     return testArray.map((value) => {
-      this.findTestArray(timeTableArray,value.subject_id)
+      this.findTestArray(timeTableArray, value.subject_id)
       return {
         ...value,
-        ...this.findTestArray(timeTableArray,value.subject_id),
+        ...this.findTestArray(timeTableArray, value.subject_id),
         can_be_start: this.canTestBeStart({
           ...value,
-          ...this.findTestArray(timeTableArray,value.subject_id)
+          ...this.findTestArray(timeTableArray, value.subject_id)
         })
       }
     })
   }
-    findTestArray(testArray: TestsForStudent[], id) {
-      return  testArray.find(item => item.subject_id === id);
-    }
-    private canTestBeStart(row: TestsForStudent) {
+  findTestArray(testArray: TestsForStudent[], id) {
+    return testArray.find(item => item.subject_id === id);
+  }
+  private canTestBeStart(row: TestsForStudent) {
     const currDate = new Date();
     const startDate = new Date(`${row.start_date} ${row.start_time}`);
     const endDate = new Date(`${row.end_date} ${row.end_time}`);
@@ -103,11 +103,12 @@ export class StudentInfoService {
     return this.getTimeTableByGroup(groupId).pipe(
       switchMap((timeTableData: TimeTable[]) => {
         const filteredTimeTable = timeTableData
-          .map(({timetable_id, group_id, ...rest}) => rest)
+          .map(({ timetable_id, group_id, ...rest }) => rest)
           .filter((item) => {
-            const date = new Date(item.end_date)
-            return date > now;
-          } )
+            const startDate = new Date(`${item.start_date} ${item.start_time}`);
+            const endDate = new Date(`${item.end_date} ${item.end_time}`);
+            return now >= startDate && now <= endDate;
+          })
         timeTable.push(filteredTimeTable);
         return this.getSubjects();
       }),
