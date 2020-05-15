@@ -54,10 +54,10 @@ export class StudentInfoComponent implements OnInit {
   testInProgress: boolean;
 
   ngOnInit() {
-    this.store.pipe(
-      select(areTimeTableLoaded),
-      areDataLoaded(() =>  this.store.dispatch(loadTimeTable()))
-    ).subscribe();
+    // this.store.pipe(
+    //   select(areTimeTableLoaded),
+    //   areDataLoaded(() =>  this.store.dispatch(loadTimeTable()))
+    // ).subscribe();
 
     this.store.pipe(
       select(selectTimeTableAndUserInfo),

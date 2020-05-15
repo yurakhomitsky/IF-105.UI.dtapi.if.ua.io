@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StudentComponent } from './student.component';
 import { Routes, RouterModule } from '@angular/router';
-import { HttpClient} from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { SharedModule } from '../shared/shared.module';
@@ -15,19 +15,24 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { StudentInfoComponent } from './student-info/student-info.component';
-import {CountdownModule} from 'ngx-countdown';
-import {StudentInfoService} from './student-info.service';
+import { CountdownModule } from 'ngx-countdown';
+import { StudentInfoService } from './student-info.service';
 import { StoreModule } from '@ngrx/store';
 import { reducers } from './store/mainReducer';
 import { EffectsModule } from '@ngrx/effects';
 import { TimeTableEffects } from './store/studentTimeTable/studentTimeTable.effects';
+import { StudentProfileComponent } from './student-profile/student-profile.component';
+import { StudentInfoResolver } from './student-info/student-info.resolver';
 
 const routes: Routes = [
   {
-    path: '', component: StudentComponent,
+    path: '', resolve: {
+      studentInfo: StudentInfoResolver
+    }, component: StudentComponent,
     children: [
-      { path: '', redirectTo: 'home', pathMatch: 'full'},
+      { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', component: StudentInfoComponent },
+      { path: 'profile', component: StudentProfileComponent },
       { path: 'test-player', component: TestPlayerComponent },
     ],
   }
@@ -40,26 +45,27 @@ const routes: Routes = [
     QuestionMenuItemComponent,
     QuestionAnswerComponent,
     StudentInfoComponent,
+    StudentProfileComponent
   ],
-    imports: [
-        CommonModule,
-        RouterModule.forChild(routes),
-        TranslateModule.forChild({
-            loader: {
-                provide: TranslateLoader,
-                useFactory: HttpLoaderFactory,
-                deps: [HttpClient]
-            }
-        }),
-        MatTableModule,
-        MatIconModule,
-        MatTabsModule,
-        MatButtonModule,
-        SharedModule,
-        CountdownModule,
-        StoreModule.forFeature('student', reducers),
-        EffectsModule.forFeature([TimeTableEffects])
-    ],
+  imports: [
+    CommonModule,
+    RouterModule.forChild(routes),
+    TranslateModule.forChild({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient]
+      }
+    }),
+    MatTableModule,
+    MatIconModule,
+    MatTabsModule,
+    MatButtonModule,
+    SharedModule,
+    CountdownModule,
+    StoreModule.forFeature('student', reducers),
+    EffectsModule.forFeature([TimeTableEffects])
+  ],
   providers: [
     TestPlayerService,
     StudentInfoService,

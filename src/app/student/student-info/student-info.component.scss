@@ -1,6 +1,13 @@
 button {
   width: fit-content;
 }
+
+.profile_button {
+  position: absolute;
+  right: 40px;
+  top: 85px;
+}
+
 $color-primary-light: #3981df;
 $color-grey-text: #848484;
 .main-container {
@@ -18,11 +25,19 @@ $color-grey-text: #848484;
 .mat-card-header {
   justify-content: center;
 }
+.test-details {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
 table {
   width: 100%;
   box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
 }
+
 .table-info {
+  width: 1000px;
   height: 500px;
   overflow: auto;
   margin: 20px;
@@ -36,50 +51,7 @@ table {
   border-right: 1px solid #e0e0e0;
 }
 
-.profile_card { 
-  margin:  15px;
-}
-.profile_information {
-  &_content:first-child {
-    font-size: 1.3rem;
-    font-weight: 500;
-    font-family: Roboto, "Helvetica Neue", sans-serif;
-    text-align: center;
-  }
-  &_content {
-    margin-bottom: 10px
-  }
-  .s_title {
-    font-size: 1.1rem;
-    font-weight: 400;
-  }
-  .s_description {
-    font-size: 1.1rem;
-    word-wrap: break-word;
-    color: $color-grey-text;
-  }
-}
 
-.view__profile {
-  margin-bottom: 20px;
-  &_container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-}
-
-@media screen and (max-width: 1200px) {
-  .table-info {
-    width: 700px;
-    height: 400px;
-    overflow: auto;
-  }
-  table {
-    width: 130%;
-  }
-}
 @media screen and (max-width: 1010px) {
   .main-container {
     flex-wrap: wrap-reverse;
@@ -95,7 +67,16 @@ table {
     width: 95%;
   }
 }
-
+@media screen and (max-width: 600px) {
+  .table-info {
+    // width: 700px;
+    // height: 400px;
+    // overflow: auto;
+  }
+  table {
+    width: 200%;
+  }
+}
 .mat-column-subject {
   white-space: unset !important;
   flex: 0 0 28% !important;

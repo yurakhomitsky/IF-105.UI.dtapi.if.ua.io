@@ -15,16 +15,6 @@ export class SubjectResolver implements Resolve<boolean> {
     constructor(private store: Store<AdminState>) {}
 
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
-        // return this.store.pipe(
-        //     select(areSubjectsLoaded),
-        //     tap((subjectsLoaded) => {
-        //         if (!subjectsLoaded) {
-        //             this.store.dispatch(loadSubjects());
-        //         }
-        //     }),
-        //     filter(subjectsLoaded => subjectsLoaded),
-        //     first()
-        // )
         return this.store.pipe(
             select(areSubjectsLoaded),
             areDataLoaded(() => {
