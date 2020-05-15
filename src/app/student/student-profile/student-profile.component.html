@@ -1,0 +1,53 @@
+<div class="profile">
+  <section class="title">
+      <div class="button_home">
+        <button mat-raised-button [routerLink]="['../']">Головна</button>
+      </div>
+    <div class="title-container edge-display">
+      <h3 class="title-heading">Особиста інформація</h3>
+    </div>
+  </section>
+  <section class="profile-container">
+    <mat-card class="profile_card">
+      <!-- <mat-card-header>
+        <mat-card-title>Особиста Інформація студента</mat-card-title>
+      </mat-card-header> -->
+      <mat-card-content class="view__profile">
+        <div class="view__profile_container">
+          <div class="profile_photo">
+            <img class="photo" alt="Фото студента" [src]="studentInfo?.photo" />
+          </div>
+          <div class="profile_information">
+            <div class="profile_information_content">
+              <p>
+                {{ studentInfo?.student_surname }}
+                {{ studentInfo?.student_name }} {{ studentInfo?.student_fname }}
+              </p>
+              <h4 class="s_description"></h4>
+            </div>
+            <div class="profile_information_content">
+              <div class="s_title">Факультет</div>
+              <div class="s_description">{{ studentInfo?.faculty_name }}</div>
+            </div>
+
+            <div class="profile_information_content">
+              <div class="s_title">Спеціальність</div>
+              <div class="s_description">
+                {{ studentInfo?.speciality_code }}
+                {{ studentInfo?.speciality_name }}
+              </div>
+            </div>
+            <div class="profile_information_content">
+              <div class="s_title">Група</div>
+              <div class="s_description">{{ studentInfo?.group_name }}</div>
+            </div>
+            <div class="profile_information_content">
+              <div class="s_title">Заліковна книжка</div>
+              <div class="s_description">{{ studentInfo?.gradebook_id }}</div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </section>
+</div>

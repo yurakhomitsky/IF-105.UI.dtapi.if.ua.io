@@ -39,17 +39,18 @@ export class TestPlayerService {
     return this.http.get('testPlayer/getData');
   }
   getQuestionList(testId: number) {
-    return this.getLog(testId)
-    .pipe(
-      catchError(({error}) => {
-        if (error.response === 'User is making test at current moment') {
-          return of(null);
-        }
-        return throwError(error);
-      }),
-      switchMap(() => {
-        return this.getTestDetails(testId)
-      }),
+    return this.getTestDetails(testId).pipe(
+    // return this.getLog(testId)
+    // .pipe(
+    //   catchError(({error}) => {
+    //     if (error.response === 'User is making test at current moment') {
+    //       return of(null);
+    //     }
+    //     return throwError(error);
+    //   }),
+    //   switchMap(() => {
+    //     return this.getTestDetails(testId)
+    //   }),
       switchMap((questionDetails: any) => {
         const questionsByLevel$ = questionDetails
           .map(({ level, tasks }) => this.getQuestionByLevel(testId, level, tasks));
