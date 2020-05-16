@@ -6,6 +6,7 @@ import { areTimeTableLoaded } from '../store/studentTimeTable/studentTimeTable.s
 import { areDataLoaded } from 'src/app/admin/store/store-operators'
 import { loadTimeTable } from '../store/studentTimeTable/studentTimeTable.actions'
 import { Observable } from 'rxjs'
+import { tap } from 'rxjs/operators'
 
 @Injectable({ providedIn: 'root'})
 export class StudentInfoResolver implements Resolve<boolean> {
@@ -15,8 +16,9 @@ export class StudentInfoResolver implements Resolve<boolean> {
         return this.store.pipe(
             select(areTimeTableLoaded),
             areDataLoaded(() => {
+                console.log('Here');
                 this.store.dispatch(loadTimeTable())
-            })
+            }),
         )
     }
 }

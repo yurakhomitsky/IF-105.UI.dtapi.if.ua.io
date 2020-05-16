@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Faculty, Group, Speciality, StudentInfo, TimeTable, TestsForStudent } from '../shared/entity.interface';
-import { concatMap, map, switchMap } from 'rxjs/operators';
+import { concatMap, map, switchMap, filter } from 'rxjs/operators';
 import { Subject, Test } from '../admin/entity.interface';
 import { AuthService } from '../shared/auth.service';
 import { Store } from '@ngrx/store';
@@ -21,6 +21,7 @@ export class StudentInfoService {
 
   getUserData() {
     return this.store.select(selectUserData).pipe(
+      filter((user) => !!user),
       switchMap(user => {
         return this.getData(user.id);
       })

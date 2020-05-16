@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ApiService } from '../../shared/services/api.service';
 import { StudentInfo, TestsForStudent } from '../../shared/entity.interface';
 import { Router } from '@angular/router';
@@ -14,17 +14,19 @@ import { ErrorResponse } from '../student.errors.response';
 import { Store, select } from '@ngrx/store';
 import { StudentState } from '../store/mainReducer';
 import { loadTimeTable } from '../store/studentTimeTable/studentTimeTable.actions';
-import { find, filter, tap } from 'rxjs/operators';
+import { find, filter, tap, takeUntil } from 'rxjs/operators';
 import { selectTimeTableAndUserInfo, areTimeTableLoaded } from '../store/studentTimeTable/studentTimeTable.selectors';
 import { areDataLoaded } from 'src/app/admin/store/store-operators';
+import { UnSubscribeService } from 'src/app/shared/services/unsubsrice.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-student-info',
   templateUrl: './student-info.component.html',
   styleUrls: ['./student-info.component.scss']
 })
-export class StudentInfoComponent implements OnInit {
-
+export class StudentInfoComponent implements OnInit, OnDestroy {
+  unsubscribe$: Observable<any>;
   dataSource = new MatTableDataSource<TestsForStudent>();
   displayedColumns: string[] = [
     'subject',
@@ -45,7 +47,8 @@ export class StudentInfoComponent implements OnInit {
     private modalService: ModalService,
     public session: SessionStorageService,
     private testPlayerService: TestPlayerService,
-    private store: Store<StudentState>
+    private store: Store<StudentState>,
+    private unSubscribeService: UnSubscribeService
   ) {
   }
 
@@ -54,30 +57,19 @@ export class StudentInfoComponent implements OnInit {
   testInProgress: boolean;
 
   ngOnInit() {
-    // this.store.pipe(
-    //   select(areTimeTableLoaded),
-    //   areDataLoaded(() =>  this.store.dispatch(loadTimeTable()))
-    // ).subscribe();
-
+    this.unsubscribe$ = this.unSubscribeService.unsubscribeP;
     this.store.pipe(
+      takeUntil(this.unsubscribe$),
       select(selectTimeTableAndUserInfo),
       filter(Boolean))
-      .subscribe(({ userInfo, timeTable }) => {
+      .subscribe(({ _, timeTable }) => {
         this.dataSource.data = timeTable;
         this.dataSource.paginator = this.paginator;
-        if (userInfo.photo === '') {
-          userInfo = {
-            ...userInfo,
-            photo: defaultImage
-          }
-
-          this.studentInfo = userInfo;
-        } else {
-          this.studentInfo = userInfo;
-        }
       });
   }
-
+  ngOnDestroy() {
+    this.unSubscribeService.unSubscribe();
+  }
 
   public goToTest(tableEl: TestsForStudent) {
     this.testPlayerService.getLog(tableEl.test_id)
