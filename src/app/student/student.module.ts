@@ -23,17 +23,19 @@ import { EffectsModule } from '@ngrx/effects';
 import { TimeTableEffects } from './store/studentTimeTable/studentTimeTable.effects';
 import { StudentProfileComponent } from './student-profile/student-profile.component';
 import { StudentInfoResolver } from './student-info/student-info.resolver';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatListModule } from '@angular/material/list';
+import { FormsModule } from '@angular/forms';
+import { TestPlayerResolver } from './test-player/test-player.resolver';
 
 const routes: Routes = [
   {
-    path: '', resolve: {
-      studentInfo: StudentInfoResolver
-    }, component: StudentComponent,
+    path: '',  component: StudentComponent,
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
-      { path: 'home', component: StudentInfoComponent },
-      { path: 'profile', component: StudentProfileComponent },
-      { path: 'test-player', component: TestPlayerComponent },
+      { path: 'home', component: StudentInfoComponent,  resolve: { studentInfo: StudentInfoResolver}},
+      { path: 'profile', component: StudentProfileComponent,  resolve: { studentInfo: StudentInfoResolver} },
+      { path: 'test-player', component: TestPlayerComponent, resolve: { questionsList: TestPlayerResolver } },
     ],
   }
 ];
@@ -61,7 +63,10 @@ const routes: Routes = [
     MatIconModule,
     MatTabsModule,
     MatButtonModule,
+    MatCheckboxModule,
+    MatListModule,
     SharedModule,
+    FormsModule,
     CountdownModule,
     StoreModule.forFeature('student', reducers),
     EffectsModule.forFeature([TimeTableEffects])

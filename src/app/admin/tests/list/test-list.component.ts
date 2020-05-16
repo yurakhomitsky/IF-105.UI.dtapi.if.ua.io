@@ -196,7 +196,7 @@ export class TestListComponent implements OnInit, OnDestroy {
           this.modalService.openInfoModal('Тест видалено');
         },
         err => {
-          this.modalService.openErrorModal('Помилка видалення');
+          this.modalService.openErrorModal('Помилка видалення, можливо через залежності в таблицях');
         });
   }
 

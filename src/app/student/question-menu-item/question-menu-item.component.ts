@@ -1,11 +1,12 @@
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output, OnChanges, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-question-menu-item',
   templateUrl: './question-menu-item.component.html',
-  styleUrls: ['./question-menu-item.component.scss']
+  styleUrls: ['./question-menu-item.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class QuestionMenuItemComponent implements OnInit {
+export class QuestionMenuItemComponent implements OnInit, OnChanges {
   @Input() index: number;
   @Input() question: any;
   @Input() addedQuestionAnswer: any;
@@ -13,7 +14,8 @@ export class QuestionMenuItemComponent implements OnInit {
   @Input() markedQuestions: any;
   @Output() viewQuestionOutput = new EventEmitter();
   constructor() { }
-
+  ngOnChanges(changes): void {
+  }
   ngOnInit() {
   }
   chooseQuestion() {
@@ -22,14 +24,14 @@ export class QuestionMenuItemComponent implements OnInit {
 
   isQuestionMarked() {
     return this.markedQuestions.find((question: number) => {
-     return question === this.question.question_id;
+      return question === this.question.question_id;
     })
-      return true;
-    }
- 
+    return true;
+  }
+
   changeStyle() {
     return !!this.addedQuestionAnswer.find((answer) => {
-      return answer.question === this.question.question_id;
+      return answer.question === this.question.question_id && !!answer.answer.toString();
     });
   }
 }

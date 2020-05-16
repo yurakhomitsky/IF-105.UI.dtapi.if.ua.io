@@ -1,23 +1,21 @@
 .numberWrapper {
-    border: 2px solid black;
-    border-radius: 5px;
-    width: 40px;
-    height: 40px;
-    text-align: center;
-    vertical-align: middle;
-    display: table-cell;
-    background-color: rgb(236, 220, 220);
-    margin-right: 20px;
+    border-radius: 50px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
     cursor: pointer;
   
     &.is-answered {
-        background-color:#6383e9;
+        background-color:#60CA63;
     }
     &.is-marked {
-        background-color: #4aca48;
+        background-color: #EEDA4A;
     }
     &.is-choosen {
-        border-color: brown;
+        background-color:#CACACA;
     }
 }
 .mainWrapper {

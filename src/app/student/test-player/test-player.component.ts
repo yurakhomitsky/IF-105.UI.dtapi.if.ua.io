@@ -1,12 +1,13 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {TestPlayerService} from '../test-player.service';
 import {ActivatedRoute} from '@angular/router';
-import {filter, map, switchMap} from 'rxjs/operators';
+import {filter, map, switchMap, tap, takeUntil} from 'rxjs/operators';
 import {ModalService} from '../../shared/services/modal.service';
 import {Test} from '../../admin/entity.interface';
 import {SessionStorageService} from 'angular-web-storage';
 import {TestLogoutService} from '../../shared/services/test-logout.service';
 import { UnSubscribeService } from 'src/app/shared/services/unsubsrice.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-test-player',
@@ -29,6 +30,7 @@ export class TestPlayerComponent implements OnInit, OnDestroy {
   serverTime: number;
   testInProgress;
   subscription: any;
+  unsubscribe$ = new Subject<void>();
 
   constructor(private testPlayerService: TestPlayerService,
               private route: ActivatedRoute,
@@ -57,23 +59,59 @@ export class TestPlayerComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.route.queryParamMap.subscribe((params: any) => {
-      const testId = params.params.id;
-      this.getTimeForTest(testId);
-      this.userTime = Math.floor(Date.now() / 1000) + 10800;
-      return this.testPlayerService.getQuestionList(+testId)
-        .subscribe(questions => {
-          this.questions = questions;
-        });
-    });
+   this.route.queryParamMap
+    .pipe(
+      takeUntil(this.unsubscribe$),
+      tap(() => {
+        this.userTime = Math.floor(Date.now() / 1000) + 10800;
+      }),
+      switchMap((testId) => {
+        return  this.getTimeForTest(+testId.get('id'));
+      }),
+      switchMap(() => this.route.data),
+    )
+    .subscribe(({questionsList}) => {
+      this.questions = this.mapForCheckBoxes(questionsList);
+    })
+    // this.route.queryParamMap.subscribe((params: any) => {
+    //   const testId = params.params.id;
+    //   this.getTimeForTest(testId);
+    //   this.userTime = Math.floor(Date.now() / 1000) + 10800;
+    //   return this.testPlayerService.getQuestionList(+testId)
+    //     .subscribe(questions => {
+    //       this.questions = this.mapForCheckBoxes(questions);
+    //       console.log(this.questions);
+
+    //     });
+    // });
     this.testInProgress = setInterval(() => {
       this.synchronizeTime();
     }, 60000);
   }
-
+  mapForCheckBoxes(questions) {
+    return questions.map((item) => {
+      if (item.type === '2') {
+        return {
+          ...item,
+          answers: item.answers.map((answer) => ({ ...item, checked: false  })),
+          shuffledAnswers: [...item.answers]
+        }
+      } else if(item.type === '1') {
+        return {
+          ...item,
+          shuffledAnswers: [...item.answers]
+        }
+      }
+       else {
+        return item
+      }
+    })
+  }
   ngOnDestroy() {
     clearInterval(this.testInProgress);
     this.subscription.unsubscribe();
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
   viewQuestionParent(id: string) {
@@ -115,11 +153,13 @@ export class TestPlayerComponent implements OnInit, OnDestroy {
   }
 
   getTimeForTest(id): any {
-    this.testPlayerService.getTestInfo(id).subscribe((data: Test[]) => {
+   return this.testPlayerService.getTestInfo(id).pipe(
+     tap((data) => {
       const time = data[0].time_for_test * 60;
       this.timeForTest = time;
       this.timer = time;
-    });
+     })
+   )
   }
 
   synchronizeTime() {

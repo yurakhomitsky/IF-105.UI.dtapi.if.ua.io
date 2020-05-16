@@ -16,14 +16,7 @@ export class QuestionAnswerComponent implements OnChanges {
   constructor(private sanitizer: DomSanitizer) { }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (!this.choosenQuestion) {
-      return;
-    }
-    if (changes.choosenQuestion && (this.choosenQuestion.type === "1" || this.choosenQuestion.type === "2")) {
-      this.choosenQuestion.shuffledAnswers = this.shuffle(this.choosenQuestion.answers);
-    }
   }
-
   isSimpleChoiceChecked(id: number) {
     return this.choosenAnswer ? id === this.choosenAnswer.answer : false;
   }
@@ -33,6 +26,7 @@ export class QuestionAnswerComponent implements OnChanges {
   }
 
   getAttachmentUrl(attachment) {
+    if(!attachment) return
     return this.sanitizer.bypassSecurityTrustResourceUrl(attachment);
   }
 
@@ -50,7 +44,6 @@ export class QuestionAnswerComponent implements OnChanges {
     }
     return answers;
   }
-  
   getCheckboxAnswer(answerId: any) {
     if(this.checkboxAnswersList.includes(answerId)) {
       this.checkboxAnswersList = this.checkboxAnswersList.filter(checkboxAnswerList => {

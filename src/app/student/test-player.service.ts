@@ -40,17 +40,6 @@ export class TestPlayerService {
   }
   getQuestionList(testId: number) {
     return this.getTestDetails(testId).pipe(
-    // return this.getLog(testId)
-    // .pipe(
-    //   catchError(({error}) => {
-    //     if (error.response === 'User is making test at current moment') {
-    //       return of(null);
-    //     }
-    //     return throwError(error);
-    //   }),
-    //   switchMap(() => {
-    //     return this.getTestDetails(testId)
-    //   }),
       switchMap((questionDetails: any) => {
         const questionsByLevel$ = questionDetails
           .map(({ level, tasks }) => this.getQuestionByLevel(testId, level, tasks));
@@ -72,7 +61,7 @@ export class TestPlayerService {
         return questions.map((question: any) => {
           return {
             ...question,
-            answers: flattenAnswers.filter(({ question_id }) => question_id === question.question_id),
+            answers: this.shuffle(flattenAnswers.filter(({ question_id }) => question_id === question.question_id)),
           }
         });
       })
@@ -89,5 +78,15 @@ export class TestPlayerService {
 
   getTime() {
     return this.http.get('TestPlayer/getTimeStamp');
+  }
+  shuffle(answers) {
+    if (!answers || !answers.length) {
+      return [];
+    }
+    for (let i = answers.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [answers[i], answers[j]] = [answers[j], answers[i]];
+    }
+    return answers;
   }
 }

@@ -102,12 +102,12 @@ export class StudentsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.updateData = false;
     this.showModalWindow(this.submitButtonText, this.updateData).afterClosed().subscribe((response) => {
       if (!response) {
-        return this.showSnackBar('НЕМАЄ ВІДПОВІДІ ВІД СЕРВЕРУ. МОЖЛИВІ ПРОБЛЕМИ З ПІДКЛЮЧЕННЯМ АБО СЕРВЕРОМ');
+        return this.modalService.openSnackBar('Можливі проблема із підлюченням','info');
       } else if (response.response === 'ok') {
         // this.showStudentsByGroup();
-        return this.showSnackBar('Студент доданий, дані збережено');
+        return this.modalService.openSnackBar('Студент доданий, дані збережено','success');
       } else if (response === 'Canceled') {
-        return this.showSnackBar('Скасовано');
+        return this.modalService.openSnackBar('Скасовано','info');
       }
     });
   }
@@ -118,12 +118,12 @@ export class StudentsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showModalWindow(this.submitButtonText, this.updateData, student)
       .afterClosed().subscribe((response) => {
         if (!response) {
-          return this.showSnackBar('НЕМАЄ ВІДПОВІДІ ВІД СЕРВЕРУ. МОЖЛИВІ ПРОБЛЕМИ З ПІДКЛЮЧЕННЯМ АБО СЕРВЕРОМ');
+          return this.modalService.openSnackBar('Можливі проблема із підлюченням','info');
         } else if (response.response === 'ok') {
           // this.showStudentsByGroup();
-          return this.showSnackBar('Дані студента змінено та збережено');
+          return this.modalService.openSnackBar('Студента успішно оновлено','success');
         } else if (response === 'Canceled') {
-          return this.showSnackBar('Скасовано');
+          return this.modalService.openSnackBar('Скасовано','info');
         }
       });
   }
@@ -134,9 +134,10 @@ export class StudentsComponent implements OnInit, AfterViewInit, OnDestroy {
       if (data && data.response === 'ok') {
         this.store.dispatch(studentDelete({id: idNum}));
         // this.dataSource.data = this.dataSource.data.filter(student => student.user_id !== id);
-        return this.showSnackBar('Студент видалений, дані збережено');
+        return this.modalService.openSnackBar('Студента успішно видалено','success');
       }
-    });
+    },
+    () => this.modalService.openInfoModal('Помилка при видаленні студента, можливо через залежності в інших таблицях'));
   }
 
   transferStudent(student: Student) {
