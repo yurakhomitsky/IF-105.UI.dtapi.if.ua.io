@@ -17,13 +17,6 @@
             }
         }
 }
-
-button {
-    background-color: green($color: #000000);
-    width: 200px;
-    height: 30px;
-    margin-left: 20px;
-}
 .mark-answer {
     display: block;
     margin: 20px auto;
@@ -32,10 +25,74 @@ button {
     box-shadow: 0 0 20px rgba(20, 20, 14, 0.5);
     cursor: pointer;
 }
-.text-input-wrapper{
+.input-field{
+    display: block;
+    margin: 0 auto;
+    font-size: 1rem;
     width: 50%;
 }
-.mainWrapper {
-    border-top: darkslategray 1px solid;
-    margin-top: 20px;
+
+.input-answer {
+    display: flex;
+    align-items: center;
+    &-text {
+        padding: 10px;
+        margin: 5px;
+        white-space: pre-line;
+    }
+    // &-img {
+    //     width: 50%;
+    // }
+    img {
+        max-width: 70%;
+    }
+}
+.container {
+    display: flex;
+    justify-content: center;
+    margin: 10px;
+    ul {
+        list-style: none;
+    }
+    .question-container {
+        width: 800px;
+        display: flex;
+        flex-direction: column;
+        border-radius: 5px;
+        border: 1px solid #EAEAEC;
+        img {
+            max-width: 70%;
+        }
+        box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+        .question-text {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 1px solid #EAEAEC;
+        }
+        .question-answers {
+            font-size: 1.2rem;
+            mat-list {
+                padding: 5px;
+
+            }
+            mat-list-item {
+                border-radius: 5px;
+                &:hover {
+                    background-color: #E7E7E7;
+                }
+                &:not(:last-child) {
+                    border-bottom: 1px solid #EAEAEC;
+                }
+            }
+        }
+        .button-point {
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid #EAEAEC;
+        }
+    }
+}
+.mat-list-base .mat-list-item, .mat-list-base .mat-list-option {
+    min-height: 48px;
+    height: fit-content;
 }

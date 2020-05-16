@@ -4,6 +4,9 @@ import { Faculty, Group, Speciality, StudentInfo, TimeTable, TestsForStudent } f
 import { concatMap, map, switchMap } from 'rxjs/operators';
 import { Subject, Test } from '../admin/entity.interface';
 import { AuthService } from '../shared/auth.service';
+import { Store } from '@ngrx/store';
+import { AuthState } from '../login/reducers';
+import { selectUserData } from '../login/store/login.selectors';
 
 
 @Injectable({
@@ -12,15 +15,16 @@ import { AuthService } from '../shared/auth.service';
 export class StudentInfoService {
 
   constructor(private http: HttpClient,
-    private authService: AuthService) {
+    private authService: AuthService,
+    private store: Store<AuthState>) {
   }
 
   getUserData() {
-    return this.authService.getCurrentUser().pipe(
+    return this.store.select(selectUserData).pipe(
       switchMap(user => {
         return this.getData(user.id);
       })
-    );
+    )
   }
 
   getStudent(studentId) {

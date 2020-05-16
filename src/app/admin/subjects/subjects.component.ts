@@ -179,7 +179,7 @@ export class SubjectsComponent implements OnInit, OnDestroy {
         this.store.dispatch(subjectDelete({id}));
         this.modalService.openSnackBar('Предмет успішно видалено','success');
       },
-      () => this.modalService.openSnackBar('Помилка при видаленні','alert'));
+      () => this.modalService.openInfoModal('Неможливо видалити предмет. Через залежності в інших таблицях'))
   }
 
   navigateToTimeTable(subjectId) {

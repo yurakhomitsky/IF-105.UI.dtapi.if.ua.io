@@ -29,7 +29,7 @@ export class ApiHttpInterceptor implements HttpInterceptor {
             this.openSnackBar(this.translate.instant(mappedError.message) , 'X');
           }
           // this.openSnackBar(mappedError && this.translate.instant(mappedError.message) || this.translate.instant(defaultMessage), 'X');
-          if (error.status === 401 || error.status === 403) {
+          if (error.status === 401 || (error.status === 403 && !error.error.response.includes('You cannot make the test due to used all attempts'))) {
             this.router.navigate(['login']);
           }
           return throwError(error);

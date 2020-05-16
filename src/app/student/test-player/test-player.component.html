@@ -6,23 +6,25 @@
             <countdown *ngIf="timer > 300" [config]="{leftTime: timer}" (event)="finish($event)"></countdown>
             <countdown *ngIf="timer <= 300" class="five-minutes" [config]="{leftTime: timer}" (event)="finish($event)"></countdown>
         </span>
-        <button class="finishTest" (click)="sendAnswersForCheck()">
+        <button mat-raised-button color="primary"  (click)="sendAnswersForCheck()">
             Завершити тест
         </button>
     </p>
-
-    <div class="container-numbers">
-        <app-question-menu-item
-            *ngFor="let question of questions let i = index"
-            [isChoosen]="question.question_id === (choosenQuestionId || questions[0].question_id)"
-            [index]="i + 1"
-            [question]="question"
-            [addedQuestionAnswer]="addedQuestionAnswer"
-            [markedQuestions]="markedQuestions"
-            (viewQuestionOutput)="viewQuestionParent($event)">
-        </app-question-menu-item>
+<section class="container-test-player">
+    <div class="container-quiz-navigation">
+        <section class="container-quiz-navigation-wrap">
+            <app-question-menu-item
+                *ngFor="let question of questions let i = index"
+                [isChoosen]="question.question_id === (choosenQuestionId || questions[0].question_id)"
+                [index]="i + 1"
+                [question]="question"
+                [addedQuestionAnswer]="addedQuestionAnswer"
+                [markedQuestions]="markedQuestions"
+                (viewQuestionOutput)="viewQuestionParent($event)">
+            </app-question-menu-item>
+        </section>
     </div>
-
+</section>
     <app-question-answer
         [choosenQuestion]="choosenQuestion"
         [choosenAnswer]="choosenAnswer"
