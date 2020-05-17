@@ -14,6 +14,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ResultGroupRaitingComponent } from './result-group-raiting/result-group-raiting.component';
 import { LevelResultsChartComponent } from './level-results-chart/level-results-chart.component';
 import { ResultGroupsRaitingComponent } from './result-groups-raiting/result-groups-raiting.component';
+import { MatPaginator } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-results',
@@ -46,6 +47,8 @@ export class ResultsComponent implements OnInit {
   ];
 
   @ViewChild(MatSort, { static: true }) sort: MatSort;
+  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
+
 
   constructor(
     private fb: FormBuilder,
@@ -149,9 +152,9 @@ export class ResultsComponent implements OnInit {
         const student = this.resultsService.getFullNameStudent(item.student_id, res1);
         return { ...item, student, duration, score, twenty };
       });
-      console.log(this.listResults);
       this.dataSource.data = this.listResults;
       this.dataSource.sort = this.sort;
+      this.dataSource.paginator = this.paginator;
     }, () => {
       this.modalService.openErrorModal('Помилка завантаження даних');
     });

@@ -53,3 +53,8 @@ container, .question, .answer {
 mat-icon {
     cursor: pointer;
 }
+.question-attachment {
+    img {
+        max-width: 77%;
+    }
+}
