@@ -20,8 +20,7 @@ export class StudentInfoService {
   }
 
   getUserData() {
-    return this.store.select(selectUserData).pipe(
-      filter((user) => !!user),
+    return this.authService.getCurrentUser().pipe(
       switchMap(user => {
         return this.getData(user.id);
       })

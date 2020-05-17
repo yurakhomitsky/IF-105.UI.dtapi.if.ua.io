@@ -47,3 +47,10 @@ html {
 .mat-simple-snackbar-action {
   color: black;
 }
+.mat-radio-label {
+  white-space: pre-line !important;
+}
+.mat-radio-label-content {
+  display: flex !important;
+  align-items: center;
+}

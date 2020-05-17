@@ -6,46 +6,49 @@
             </h3>
             <img *ngIf="choosenQuestion?.attachment"  alt="зображення"  [src]="getAttachmentUrl(choosenQuestion?.attachment)"/>
     </div>
-    <div class="question-answers">
-        <div *ngIf="choosenQuestion?.answers" [ngSwitch]="choosenQuestion?.type" >
-        
-            <mat-list *ngSwitchCase="'1'">
+<div class="question-answers" *ngIf="choosenQuestion?.answers">
+        <ng-container  [ngSwitch]="choosenQuestion?.type">
+            <mat-radio-group *ngSwitchCase="'1'" class="radio-group" aria-label="Виберіть відповідь" >
+                <mat-radio-button 
+                    class="radio-button"
+                    color="primary" 
+                    *ngFor="let answer of choosenQuestion?.shuffledAnswers" 
+                    [value]="answer.answer_text"
+                    [checked]="isSimpleChoiceChecked(answer.answer_id)"
+                    (change)="getRadioAnswer(answer.answer_id)"
+                    >
+                    <p class="input-answer-text">{{answer.answer_text}}</p> 
+                    <img *ngIf="answer.attachment" [src]="getAttachmentUrl(answer.attachment)"/>
+                </mat-radio-button>
+
+              </mat-radio-group>
+            <!-- <mat-list *ngSwitchCase="'1'">
             <mat-list-item *ngFor="let answer of choosenQuestion?.shuffledAnswers">
-                <mat-radio-button color="primary"
+                <mat-radio-button class="input-answer" color="primary"
                         [checked]="isSimpleChoiceChecked(answer.answer_id)"
-                        (click)="getRadioAnswer(answer.answer_id)">
-                        <div class="input-answer">
-                        <p class="input-answer-text" *ngIf="answer.answer_text">
-                            {{answer.answer_text}}
-                        </p>
-                        <div class="input-answer-img">
-                            <img *ngIf="answer.attachment" [src]="getAttachmentUrl(answer.attachment)"/>
-                        </div>
-                        
-                    </div>
+                        (change)="getRadioAnswer(answer.answer_id)">
+                            <div class="input-answer">
+                                <p class="input-answer-text" *ngIf="answer.answer_text">
+                                    {{answer.answer_text}}
+                                </p>
+                                <img *ngIf="answer.attachment" [src]="getAttachmentUrl(answer.attachment)"/>
+                            </div>
                     </mat-radio-button>
                 </mat-list-item>
-            </mat-list>
+            </mat-list> -->
 
             <mat-list *ngSwitchCase="'2'">
                 <mat-list-item *ngFor="let answer of choosenQuestion?.shuffledAnswers">
                     <mat-checkbox color="primary"
                         [checked]="isMultiChoiceChecked(answer.answer_id)"
                         [disabled]="answer.disabled"
-                        (change)="getCheckboxAnswer(answer.answer_id)"
-                        >
-                        <div class="input-answer">
-                            <p class="input-answer-text" *ngIf="answer.answer_text">
-                                {{answer.answer_text}}
-                            </p>
-                            <div class="input-answer-img">
+                        (change)="getCheckboxAnswer(answer.answer_id)">
+                            <div class="input-answer">
+                                    <p class="input-answer-text" *ngIf="answer.answer_text">
+                                        {{answer.answer_text}}
+                                    </p>
                                 <img *ngIf="answer.attachment" [src]="getAttachmentUrl(answer.attachment)"/>
                             </div>
-                        </div>
-                        <!-- <span *ngIf="answer.answer_text">
-                            {{answer.answer_text}}
-                        </span>
-                        <img *ngIf="answer.attachment" width="400" [src]="getAttachmentUrl(answer.attachment)"/> -->
                     </mat-checkbox>
                 </mat-list-item>
             </mat-list> 
@@ -54,18 +57,17 @@
                 <mat-form-field class="input-field">
                     <mat-label>Введіть текст</mat-label>
                     <input matInput #inputText type="text" (keyup)="getInputAnswer($event)" [value]="choosenAnswer?.answer">
-                  </mat-form-field>
+                </mat-form-field>
             </ng-container>
 
             <ng-container *ngSwitchCase="'4'">
                     <mat-form-field class="input-field">
                         <mat-label>Введіть текст</mat-label>
                         <input matInput #inputText type="number" (input)="getInputNumberAnswer($event)" [value]="choosenAnswer?.answer">
-                      </mat-form-field>
+                    </mat-form-field>
             </ng-container>
-
-        </div>
-    </div>
+        </ng-container>
+</div>
     <div class="button-point">
         <button mat-raised-button  (click)="markQuestion(choosenQuestion?.question_id)">Помітити, для повернення</button>
     </div>

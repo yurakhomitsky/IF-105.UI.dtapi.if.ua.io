@@ -16,7 +16,6 @@ export class StudentInfoResolver implements Resolve<boolean> {
         return this.store.pipe(
             select(areTimeTableLoaded),
             areDataLoaded(() => {
-                console.log('Here');
                 this.store.dispatch(loadTimeTable())
             }),
         )

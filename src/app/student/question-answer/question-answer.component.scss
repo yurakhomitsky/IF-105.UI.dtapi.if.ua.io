@@ -32,17 +32,16 @@
     width: 50%;
 }
 
+
+
 .input-answer {
     display: flex;
     align-items: center;
     &-text {
-        padding: 10px;
+        padding: 5px;
         margin: 5px;
         white-space: pre-line;
     }
-    // &-img {
-    //     width: 50%;
-    // }
     img {
         max-width: 70%;
     }
@@ -70,7 +69,7 @@
             border-bottom: 1px solid #EAEAEC;
         }
         .question-answers {
-            font-size: 1.2rem;
+            font-size: 1rem;
             mat-list {
                 padding: 5px;
 
@@ -91,6 +90,16 @@
             border-top: 1px solid #EAEAEC;
         }
     }
+}
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    margin: 15px 0;
+}
+
+.radio-button {
+    margin: 10px;
+    
 }
 .mat-list-base .mat-list-item, .mat-list-base .mat-list-option {
     min-height: 48px;
