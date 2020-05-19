@@ -1,30 +1,31 @@
 .container-quiz-navigation {
-    padding: 20px;
-    width: 800px;
+  padding: 20px;
+  width: 800px;
+  display: flex;
+  margin: 10px;
+  justify-content: center;
+  border-radius: 5px;
+  border: 1px solid #eaeaec;
+  box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2),
+    0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+  &-wrap {
     display: flex;
-    margin: 10px;
+    flex-wrap: wrap;
     justify-content: center;
-    border-radius: 5px;
-    border: 1px solid #EAEAEC;
-    box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
-    &-wrap {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
+  }
 }
 .container-test-player {
   display: flex;
   justify-content: center;
 }
 .finishTest {
-    margin-left: 20px;
-    width: 200px;
-    height: 30px;
-    border: 1px solid blue;
-    background-color:#6383e9;
-    box-shadow: 0 0 20px rgba(20, 20, 14, 0.5);
-    cursor: pointer;
+  margin-left: 20px;
+  width: 200px;
+  height: 30px;
+  border: 1px solid blue;
+  background-color: #6383e9;
+  box-shadow: 0 0 20px rgba(20, 20, 14, 0.5);
+  cursor: pointer;
 }
 
 .countdown-container {
@@ -35,38 +36,96 @@
 }
 
 .wrapperResults {
-    border: 1px solid black;
+  border: 1px solid black;
 }
 .wrapper-exit {
-    width: 100px;
-    height: 30px;
-    margin-top: 10px;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 10px;
-    display: block;
+  width: 100px;
+  height: 30px;
+  margin-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 10px;
+  display: block;
 }
 
 .five-minutes {
-  color: #CC0000;
+  color: #cc0000;
 }
 
 .ten-seconds {
-  color: #CC0000;
+  color: #cc0000;
   animation: blink 1s linear infinite;
 }
 
 @keyframes blink {
-  0%{opacity: 0;}
-  50%{opacity: .5;}
-  100%{opacity: 1;}
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
 }
-.resultsWrapper {
-  border: 1px solid black;
-  border-radius: 20px;
-  margin-top: 20px;
-  margin-left: auto;
-  margin-right: auto;
-  width: 300px;
-  padding: 15px 15px 0px 15px;
+
+
+.container-result {
+  display: flex;
+  justify-content: center;
+  &-card {
+    // width: 500px;
+    display: flex;
+    margin: 10px;
+    padding: 10px;
+    flex-direction: column;
+
+    .result-card {
+      color: white;
+      margin-bottom: 20px;
+      mat-card-header {
+        border-bottom: 1px solid #fff;
+      }
+      &-content {
+        padding: 70px 0px 94px 0px;
+        .result-score {
+          display: flex;
+          justify-content: center;
+          align-items: flex-end;
+          .score {
+            font-weight: 100;
+            font-size: 6rem;
+            &-text {
+              font-size: 2.5rem;
+              font-weight: 100;
+            }
+          }
+        }
+      }
+      .result-card-footer {
+        background-color: #fff;
+        color: black;
+        .result-info {
+          margin: 0px;
+          padding: 28px;
+          p {
+            margin:10px;
+          }
+        }
+      }
+    }
+  }
+}
+.exit-button {
+  display: inline-block;
+  margin: 0 auto;
+}
+.success {
+  background-image: linear-gradient(148deg, #44e371, #84cb84);
+}
+.middle {
+  background-image: linear-gradient(148deg, #e9d93d, #d2df6b);
+}
+.bad {
+  background-image: linear-gradient(148deg, #e96a3d, #df8e6b);
 }

@@ -18,6 +18,10 @@ export class TestPlayerService {
     return this.http.get(`testDetail/getTestDetailsByTest/${testId}`);
   }
 
+  maxMarkForTheTest(testId: number) {
+    return this.http.get(`testDetail/getTestRate/${testId}`);
+  }
+
   getQuestionByLevel(test_id: number, level: number, tasks: number) {
     return this.http.get(`question/getQuestionIdsByLevelRand/${test_id}/${level}/${tasks}`);
   }

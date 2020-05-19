@@ -1,13 +1,14 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {TestPlayerService} from '../test-player.service';
 import {ActivatedRoute} from '@angular/router';
-import {filter, map, switchMap, tap, takeUntil} from 'rxjs/operators';
+import {filter, map, switchMap, tap, takeUntil, mergeMap} from 'rxjs/operators';
 import {ModalService} from '../../shared/services/modal.service';
 import {Test} from '../../admin/entity.interface';
 import {SessionStorageService} from 'angular-web-storage';
 import {TestLogoutService} from '../../shared/services/test-logout.service';
 import { UnSubscribeService } from 'src/app/shared/services/unsubsrice.service';
-import { Subject } from 'rxjs';
+import { Subject, forkJoin } from 'rxjs';
+import { UserResults, ScoreCalculate } from '../../shared/entity.interface';
 
 @Component({
   selector: 'app-test-player',
@@ -23,13 +24,19 @@ export class TestPlayerComponent implements OnInit, OnDestroy {
   public addedQuestionAnswer: any = [];
   public markedQuestions: any = [];
   public isTestDone = false;
-  public testResults: any;
+  public testResults: ScoreCalculate;
+  public mockTestResult  = {
+    full_mark: 30,
+    number_of_true_answers: 8
+  }
+  public maxMark: number;
   timeForTest: number;
   timer: number;
   userTime: number;
   serverTime: number;
   testInProgress;
   subscription: any;
+  testId: number;
   unsubscribe$ = new Subject<void>();
 
   constructor(private testPlayerService: TestPlayerService,
@@ -62,7 +69,8 @@ export class TestPlayerComponent implements OnInit, OnDestroy {
    this.route.queryParamMap
     .pipe(
       takeUntil(this.unsubscribe$),
-      tap(() => {
+      tap((testId) => {
+        this.testId = +testId.get('id');
         this.userTime = Math.floor(Date.now() / 1000) + 10800;
       }),
       switchMap((testId) => {
@@ -73,17 +81,6 @@ export class TestPlayerComponent implements OnInit, OnDestroy {
     .subscribe(({questionsList}) => {
       this.questions = this.mapForCheckBoxes(questionsList);
     })
-    // this.route.queryParamMap.subscribe((params: any) => {
-    //   const testId = params.params.id;
-    //   this.getTimeForTest(testId);
-    //   this.userTime = Math.floor(Date.now() / 1000) + 10800;
-    //   return this.testPlayerService.getQuestionList(+testId)
-    //     .subscribe(questions => {
-    //       this.questions = this.mapForCheckBoxes(questions);
-    //       console.log(this.questions);
-
-    //     });
-    // });
     this.testInProgress = setInterval(() => {
       this.synchronizeTime();
     }, 60000);
@@ -144,12 +141,45 @@ export class TestPlayerComponent implements OnInit, OnDestroy {
       return {question_id: item.question, answer_ids: item.answer};
     });
 
-    return this.testPlayerService.checkTest(testDataForCheck)
-      .subscribe((results) => {
-        this.testResults = results;
+    forkJoin(
+      this.testPlayerService.checkTest(testDataForCheck),
+      this.testPlayerService.maxMarkForTheTest(this.testId))
+      .subscribe((result) => {
+        const [results, maxMarkForTest] = result;
+        // this.testResults = results;
+        this.maxMark = (maxMarkForTest as any).testRate;
+        this.testResults = this.calculateScore(results as UserResults,this.maxMark);
         this.isTestDone = true;
         this.session.clear();
       });
+  }
+  calculateScore({full_mark,number_of_true_answers}, maxMark: number): ScoreCalculate {
+    const scoreIn100Point = +(+full_mark / +maxMark * 100).toFixed();
+    const scoreIn12Point = +(+full_mark / +maxMark * 12).toFixed();
+    const scoreInPercent = +((+full_mark / +maxMark) * 100).toFixed();
+    return {
+      full_mark,
+      scoreIn100Point,
+      scoreIn12Point,
+      scoreInPercent,
+      number_of_true_answers,
+      question_length: this.questions.length,
+      maxMark
+    }
+  }
+
+  getTitleByScore(score: ScoreCalculate): string {
+    if (score.scoreInPercent >= 60) return 'Дуже добре'
+    if (score.scoreInPercent > 40 && score.scoreInPercent < 60) return 'Добре'
+    if (score.scoreInPercent <= 40) return 'Погано'
+  }
+
+  getStyleByScore(score: ScoreCalculate) {
+    return  {
+      success: (score.scoreInPercent >= 60),
+      middle: (score.scoreInPercent > 40 && score.scoreInPercent < 60),
+      bad: (score.scoreInPercent <= 40)
+    }
   }
 
   getTimeForTest(id): any {

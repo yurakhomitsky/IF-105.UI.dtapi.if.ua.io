@@ -119,3 +119,18 @@ export interface UserAnswers {
   question_id: number;
   answer_ids: number[];
 }
+
+export interface UserResults {
+  full_mark: number;
+  number_of_true_answers: number;
+}
+
+export interface ScoreCalculate {
+  full_mark: number
+  scoreIn100Point: number;
+  scoreIn12Point: number;
+  scoreInPercent: number;
+  number_of_true_answers: number;
+  question_length: number;
+  maxMark: number;
+}
