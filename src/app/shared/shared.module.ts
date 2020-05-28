@@ -57,6 +57,7 @@ import { MatTableComponent } from './mat-table/mat-table.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { HeaderEntityComponent } from './header-entity/header-entity.component';
 import { UnSubscribeService } from './services/unsubsrice.service';
+import { GenerateItemsPipe } from '../admin/questions/pipes/generateItems.pipe';
 
 
 @NgModule({
@@ -67,7 +68,8 @@ import { UnSubscribeService } from './services/unsubsrice.service';
     ToolbarComponent,
     BreadcrumbsComponent,
     MatTableComponent,
-    HeaderEntityComponent
+    HeaderEntityComponent,
+    GenerateItemsPipe
   ],
   imports: [
     CommonModule,
@@ -152,7 +154,8 @@ import { UnSubscribeService } from './services/unsubsrice.service';
     ToolbarComponent,
     BreadcrumbsComponent,
     MatTableComponent,
-    HeaderEntityComponent
+    HeaderEntityComponent,
+    GenerateItemsPipe
   ]
 })
 export class SharedModule { }

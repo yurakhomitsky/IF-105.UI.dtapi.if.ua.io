@@ -1,46 +1,7 @@
-.mat-table-wrapper {
-     table {
-        width: 100%;
-    }
- }
-
-mat-icon {
-    cursor: pointer;
-
-    &:hover{
-        &[aria-label="edit"] {
-            color: orange;
-        }
-        &[aria-label="delete"] {
-            color: red;
-        }
-    }
-    
-}
-
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 60px;
-
-    h3 {
-        margin-left: 15px;
-    }
-    .addAdmin {
-        margin-right: 15px;
-        width: 200px;
-     }
-
-}
 
  .container {
-    padding: 0 1rem;
+    margin: 0 auto;
+    padding: 1rem;
   }
   
-.filter-from-field {
-    width: calc(100% - 2rem);
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
-}
+

@@ -106,9 +106,7 @@ export class StudentsComponent implements OnInit, AfterViewInit, OnDestroy {
       } else if (response.response === 'ok') {
         // this.showStudentsByGroup();
         return this.modalService.openSnackBar('Студент доданий, дані збережено','success');
-      } else if (response === 'Canceled') {
-        return this.modalService.openSnackBar('Скасовано','info');
-      }
+      } 
     });
   }
 
@@ -122,8 +120,6 @@ export class StudentsComponent implements OnInit, AfterViewInit, OnDestroy {
         } else if (response.response === 'ok') {
           // this.showStudentsByGroup();
           return this.modalService.openSnackBar('Студента успішно оновлено','success');
-        } else if (response === 'Canceled') {
-          return this.modalService.openSnackBar('Скасовано','info');
         }
       });
   }

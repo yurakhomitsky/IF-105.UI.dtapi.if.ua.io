@@ -14,7 +14,10 @@ export class SubjectEffects {
                 ofType(SubjectAction.loadSubjects),
                  exhaustMap(() => {
                    return this.apiService.getEntity('Subject').pipe(
-                        map(data => SubjectAction.allSubjectsLoaded({ subjects: data })),
+                        map(data => {
+                        
+                         return SubjectAction.allSubjectsLoaded({ subjects: data.response? [] : data })
+                        }),
                         catchError(() => {
                             this.modalService.openSnackBar('Не вдалося виконати запит','alert');
                           return  EMPTY;

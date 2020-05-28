@@ -19,7 +19,9 @@ export class SpecialityEffects {
                 filter(([ action, hasLoaded ]) => !hasLoaded),
                 concatMap(() => {
                    return this.apiService.getEntity('Speciality').pipe(
-                        map(data =>SpecialityAction.allSpecialitiesLoaded({ specialities: data })),
+                        map(data => {
+                            return SpecialityAction.allSpecialitiesLoaded({ specialities: data.response? [] : data })
+                        }),
                         catchError(() => EMPTY)
                         )}
                     ),

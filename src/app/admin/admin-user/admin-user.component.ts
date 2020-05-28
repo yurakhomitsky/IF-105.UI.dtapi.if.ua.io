@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { IAdminUser, ICreateUpdateAdminUser } from './admin-user.interface';
-import { of, from } from 'rxjs';
-import { mergeMap } from 'rxjs/operators';
+import { IAdminUser } from './admin-user.interface';
+import { of, from, Observable, throwError } from 'rxjs';
+import { mergeMap, startWith } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CreateUpdateUserComponent } from './create-update-user/create-update-user.component';
 import { catchError } from 'rxjs/operators';
 import { ModalService } from '../../shared/services/modal.service';
 import { ApiService } from 'src/app/shared/services/api.service';
+import { MatTableDataSource } from '@angular/material/table';
+import { Column, tableActionsType, ActionTable } from '../../shared/mat-table/mat-table.interface';
 @Component({
   selector: 'app-admin-user',
   templateUrl: './admin-user.component.html',
@@ -17,8 +19,19 @@ export class AdminUserComponent implements OnInit {
   public userList: Array<IAdminUser> = [];
   public filteredList: Array<IAdminUser> = [];
   public displayedColumns: string[] = ['idColumn', 'userNameColumn', 'emailColumn', 'actionsColumn'];
-  public searchValue = "";
+  public searchValue = '';
+  public dataSource: MatTableDataSource<IAdminUser>;
+  adminUsers: IAdminUser[] = [];
 
+  columns: Column [] = [
+    {columnDef: 'id', header: 'ID'},
+    {columnDef: 'username', header: 'Імя'},
+    {columnDef: 'email', header: 'Електронна почта'},
+    {columnDef: 'action', header: 'Дії', actions: [
+      {type: tableActionsType.Edit, icon: 'edit', matTooltip: 'Редагувати', aria_label: 'edit'},
+      {type: tableActionsType.Remove, icon: 'delete', matTooltip: 'Видалити', aria_label: 'delete'}
+    ]}
+  ];
   constructor(
     private apiService: ApiService,
     public dialog: MatDialog,
@@ -27,14 +40,28 @@ export class AdminUserComponent implements OnInit {
 
   ngOnInit() {
     this.apiService.getEntity('AdminUser')
-      .subscribe((data: Array<IAdminUser>) => {
-        this.filteredList = data;
+    .subscribe((data: IAdminUser[]) => {
         this.userList = data;
-      }
-      );
+    })
   }
 
-  updateHandler(user: ICreateUpdateAdminUser & { id: number }) {
+
+  getAction(action: ActionTable<IAdminUser>) {
+    const actions = {
+      edit: () => {
+         this.updateHandler(action.body)
+      },
+      remove: () => {
+        this.openConfirmDialog(action.body);
+      },
+      default() {
+        throwError('Error');
+      }
+    };
+    (actions[action.type] || actions.default)();
+  }
+
+  updateHandler(user: IAdminUser) {
     const dialogRef = this.dialog.open(CreateUpdateUserComponent, {
       width: '450px',
       disableClose: true,
@@ -45,7 +72,7 @@ export class AdminUserComponent implements OnInit {
 
     dialogRef.afterClosed()
       .pipe(
-        mergeMap((data: ICreateUpdateAdminUser & { id: number }) => {
+        mergeMap((data) => {
           if (data) {
             const { id, username, email, password, password_confirm } = data;
             newData = ({ id, username, email } as IAdminUser);
@@ -94,7 +121,7 @@ export class AdminUserComponent implements OnInit {
 
     dialogRef.afterClosed()
       .pipe(
-        mergeMap((data: ICreateUpdateAdminUser) => {
+        mergeMap((data: IAdminUser) => {
           if (data) {
             return this.apiService.createEntity('AdminUser', data);
           }
@@ -108,16 +135,15 @@ export class AdminUserComponent implements OnInit {
       .subscribe((newData: IAdminUser) => {
         if (newData) {
           this.openSnackBar('Збережено');
-          this.userList = [newData, ...this.userList];
+          this.userList = [ ...this.userList,newData];
         }
       });
   }
-  
+
   filterHandler(event) {
     this.searchValue = event.target.value;
     this.filteredList = this.userList.filter(user => {
       return user.username.includes(this.searchValue);
-     
     });
   }
 }

@@ -7,11 +7,25 @@
     </button>
   </div>
   <div class="search-box">
-    <mat-select [ngModel]="currentTestId" (ngModelChange)="onChangeTest($event)" name="current_test">
-      <mat-option  [value]="test.test_id" *ngFor="let test of listCurrentSubjectTests">{{ test.test_name }}</mat-option>
-    </mat-select>
+    <div class="search-box-info">
+      <mat-form-field class="search-box-select">
+        <mat-label>Налаштування для теста</mat-label>
+        <mat-select [ngModel]="currentTestId" (ngModelChange)="onChangeTest($event)" name="current_test">
+          <mat-option  [value]="test.test_id" *ngFor="let test of listCurrentSubjectTests">{{ test.test_name }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <!-- <mat-select [ngModel]="currentTestId" (ngModelChange)="onChangeTest($event)" name="current_test">
+        <mat-option  [value]="test.test_id" *ngFor="let test of listCurrentSubjectTests">{{ test.test_name }}</mat-option>
+      </mat-select> -->
+      <p>Потрібно налаштувати <b>{{currentTest?.tasks}}</b> завдань для корректної роботи теста.</p>
+      <p>Всього створено питань: <b>{{questionCount}}</b></p>
+      <p class="error-message" *ngIf="listTestDetailsTotalTasks > questionCount"> Кількість завдань по рівнях перевищує кількість наявних питань. Потрібно або додані завдання, або відкорегувати налаштування </p>
+    </div>
+    
+    <button [routerLink]="['../../',currentTest?.test_id, 'questions']" mat-raised-button color="primary">До питань</button>
   </div>
   <div class="mat-elevationg-z8">
+    
     <table
       mat-table
       [dataSource]="dataSource"
@@ -65,6 +79,9 @@
     </table>
     <div class="showRatesSum">
       Максимальна кількість балів: <span>{{ listTestsDetailsRatesSum }}</span>
+    </div>
+    <div class="showRatesSum">
+      Кількість завдань по рівнях: <span>{{ listTestDetailsTotalTasks }}</span>
     </div>
     <mat-paginator [pageSizeOptions]="[10, 20]" showFirstLastButtons></mat-paginator>
   </div>

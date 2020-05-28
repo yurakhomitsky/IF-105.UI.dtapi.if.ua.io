@@ -17,7 +17,7 @@ import { ApiService } from 'src/app/shared/services/api.service';
 })
 
 export class NewQuestionComponent implements OnInit {
-
+  content: any;
   attachmentTouched = false;
   questionType = 1;
   answers: IAnswer[] = [];
@@ -109,6 +109,7 @@ export class NewQuestionComponent implements OnInit {
   }
 
   addAnswer() {
+    console.log(this.content);
     if (+this.type.value === 4) {
       for (let i = 0; i < 2; i++) {
         this.questionAnswers.push(this.fb.group({

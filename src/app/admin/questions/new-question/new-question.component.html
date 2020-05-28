@@ -1,8 +1,16 @@
-<ng-template #loadingBlock>
+<!-- <ng-template #loadingBlock>
   <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-</ng-template>
-<form [formGroup]="newQuestionForm" *ngIf="!questionLoading; else loadingBlock" class="admin-form" (ngSubmit)="createQuestion()">
-   <mat-form-field class="full-width">
+</ng-template> -->
+<!-- <ngx-codemirror
+  [(ngModel)]="content"
+  [options]="{
+    lineNumbers: true,
+    theme: 'material',
+    mode: 'markdown'
+  }"
+></ngx-codemirror> -->
+<form [formGroup]="newQuestionForm" *ngIf="!questionLoading;" class="admin-form" (ngSubmit)="createQuestion()">
+   <mat-form-field class="full-width" appearance="outline">
             <mat-label>Питання</mat-label>
             <textarea
               rows="6"
@@ -15,42 +23,46 @@
                 *ngIf="questionText.invalid && (questionText.dirty || questionText.touched)">
                   Поле обовязкове до заповнення
               </mat-error>
-    </mat-form-field>     
-    <mat-form-field class="full-width">
-        <mat-label>Тип питання</mat-label>
-        <mat-select formControlName="type">
-          <mat-option value="1">Простий вибір</mat-option>
-          <mat-option value="2">Мультивибір</mat-option>
-          <mat-option value="3">Текстове</mat-option>
-          <mat-option value="4">Числовий діапазон</mat-option>
-        </mat-select>
     </mat-form-field>
-    <mat-form-field class="full-width">
-        <mat-label>Рівень питання</mat-label>
-        <mat-select formControlName="level">
-          <mat-option value="1">1</mat-option>
-          <mat-option value="2">2</mat-option>
-          <mat-option value="3">3</mat-option>
-          <mat-option value="4">4</mat-option>
-          <mat-option value="5">5</mat-option>
-          <mat-option value="6">6</mat-option>
-          <mat-option value="7">7</mat-option>
-          <mat-option value="8">8</mat-option>
-          <mat-option value="9">9</mat-option>
-          <mat-option value="10">10</mat-option>
-          <mat-option value="11">11</mat-option>
-          <mat-option value="12">12</mat-option>
-          <mat-option value="13">13</mat-option>
-          <mat-option value="14">14</mat-option>
-          <mat-option value="15">15</mat-option>
-          <mat-option value="16">16</mat-option>
-          <mat-option value="17">17</mat-option>
-          <mat-option value="18">18</mat-option>
-          <mat-option value="19">19</mat-option>
-          <mat-option value="20">20</mat-option>
-        </mat-select>
-    </mat-form-field>
-
+    <section class="question-config">     
+      <mat-form-field class="half-width">
+          <mat-label>Тип питання</mat-label>
+          <mat-select formControlName="type">
+            <mat-option value="1">Простий вибір</mat-option>
+            <mat-option value="2">Мультивибір</mat-option>
+            <mat-option value="3">Текстове</mat-option>
+            <mat-option value="4">Числовий діапазон</mat-option>
+          </mat-select>
+      </mat-form-field>
+      <mat-form-field class="half-width">
+          <mat-label>Рівень питання</mat-label>
+          <mat-select formControlName="level">
+            <mat-option value="1">1</mat-option>
+            <mat-option value="2">2</mat-option>
+            <mat-option value="3">3</mat-option>
+            <mat-option value="4">4</mat-option>
+            <mat-option value="5">5</mat-option>
+            <mat-option value="6">6</mat-option>
+            <mat-option value="7">7</mat-option>
+            <mat-option value="8">8</mat-option>
+            <mat-option value="9">9</mat-option>
+            <mat-option value="10">10</mat-option>
+            <mat-option value="11">11</mat-option>
+            <mat-option value="12">12</mat-option>
+            <mat-option value="13">13</mat-option>
+            <mat-option value="14">14</mat-option>
+            <mat-option value="15">15</mat-option>
+            <mat-option value="16">16</mat-option>
+            <mat-option value="17">17</mat-option>
+            <mat-option value="18">18</mat-option>
+            <mat-option value="19">19</mat-option>
+            <mat-option value="20">20</mat-option>
+            <!-- <mat-option *ngFor="let item of 20 | generateItems; let index = index" [value]="index">
+              {{item}}
+            </mat-option> -->
+          </mat-select>
+      </mat-form-field>
+  </section>
     <div class="form-group">
         Зображення
         <button mat-raised-button type="button" (click)="attachmentInput.click()" class="button-with-spinner">
@@ -100,8 +112,8 @@
   <div class="form-group" *ngIf="oldAnswers && oldAnswers.length === 0">
     Це питання не має відповідей
   </div>  
-  <div formArrayName="answers">
-    <div *ngFor="let item of questionAnswers.controls; let answerIndex=index" [formGroupName]="answerIndex">
+  <div formArrayName="answers" >
+    <div class="answers" *ngFor="let item of questionAnswers.controls; let answerIndex=index" [formGroupName]="answerIndex">
 
       <mat-form-field class="full-width">
         <mat-label *ngIf="+type.value === 4 && answerIndex === 0">Мінімальне</mat-label>

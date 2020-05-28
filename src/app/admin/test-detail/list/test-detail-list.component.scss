@@ -37,10 +37,32 @@ mat-icon {
 }
 
 .search-box {
-  width: 200px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  &-info {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    flex-direction: column;
+    & > * {
+      flex: 1;
+      margin: 5px;
+    }
+  }
+  &-select {
+    width: 200px;
+  }
+ 
+ 
   margin: 20px;
 }
-
+.error-message {
+  background-color: #F3C837;
+  border-radius: 2px;
+  padding: 3px;
+}
 .showRatesSum {
   margin-top: 2px;
   display: block;

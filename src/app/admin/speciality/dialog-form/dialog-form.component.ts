@@ -23,12 +23,12 @@ export class DialogFormComponent implements OnInit {
   public specialityForm = new FormGroup({
     speciality_code: new FormControl(
       this.data ? this.data.speciality_code : '',
-      [Validators.required, Validators.pattern('^[0-9]*$'), Validators.maxLength(5)],
-      [this.getUniqueValidator('speciality_code', 'checkForUniqueValue')]),
+      [Validators.required, Validators.pattern('^[0-9]*$'), Validators.maxLength(5)]),
+      // [this.getUniqueValidator('speciality_code', 'checkForUniqueValue')]),
     speciality_name: new FormControl(
       this.data ? this.data.speciality_name : '',
-      [Validators.required],
-      [this.getUniqueValidator('speciality_name', 'checkForUniqueValue')])
+      [Validators.required]),
+      // [this.getUniqueValidator('speciality_name', 'checkForUniqueValue')])
   });
   constructor(
     private specialityService: SpecialityService,

@@ -25,7 +25,6 @@ export class QuestionsComponent implements OnInit {
   pageSize = 10;
   currentPage = 0;
   testName: string;
-
   constructor(
     private route: ActivatedRoute,
     private questionService: QuestionService,

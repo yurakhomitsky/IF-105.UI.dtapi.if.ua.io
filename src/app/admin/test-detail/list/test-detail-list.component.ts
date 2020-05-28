@@ -9,6 +9,7 @@ import { ApiService } from '../../../shared/services/api.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TestDetailAddComponent } from '../add/test-detail-add.component';
 import { combineLatest } from 'rxjs';
+import { QuestionService } from '../../questions/questions.service';
 
 @Component({
   selector: 'app-test-detail',
@@ -23,7 +24,9 @@ export class TestDetailListComponent implements OnInit {
   listCurrentSubjectTests: Test[];
   listTestsDetails: TestDetail[] = [];
   listTestsDetailsRatesSum: number;
+  listTestDetailsTotalTasks: number;
   dataSource = new MatTableDataSource<TestDetail>();
+  questionCount: number;
   displayedColumns: string[] = [
     'id',
     'level',
@@ -41,12 +44,15 @@ export class TestDetailListComponent implements OnInit {
     private modalService: ModalService,
     private route: ActivatedRoute,
     private router: Router,
+    private questionsService: QuestionService
   ) {
   }
 
   ngOnInit() {
     this.route.params.subscribe((params: any) => {
       this.currentTestId = params.id;
+      this.questionsService.getTestQuestionsCount(this.currentTestId)
+        .subscribe(res => { this.questionCount = res; });
     });
 
     this.initialize();
@@ -168,6 +174,7 @@ export class TestDetailListComponent implements OnInit {
       this.listTestsDetails.push(result[0]);
       this.dataSource.data = this.listTestsDetails;
       this.listTestsDetailsRatesSum = this.getRatesSumForCurrentTest();
+      this.listTestDetailsTotalTasks = this.getTotalTasksForCurrentTest();
       this.table.renderRows();
       this.dataSource.paginator = this.paginator;
     });
@@ -178,6 +185,7 @@ export class TestDetailListComponent implements OnInit {
       this.modalService.openSnackBar('Успішно оновлено','success');
       this.dataSource.data = this.listTestsDetails;
       this.listTestsDetailsRatesSum = this.getRatesSumForCurrentTest();
+      this.listTestDetailsTotalTasks = this.getTotalTasksForCurrentTest();
     }, (error: any) => {
       if (error.error.response.includes('Error when update')) {
         this.modalService.openErrorModal('Дані не оновлювалися');
@@ -196,7 +204,15 @@ export class TestDetailListComponent implements OnInit {
       return sum + (testDetail.tasks * testDetail.rate);
     }, 0);
   }
+  private getTotalTasksForCurrentTest(): number {
+    if (!this.listTestsDetails) {
+      return 0;
+    }
 
+    return this.listTestsDetails.reduce((sum: number, testDetail: TestDetail) => {
+      return sum + (+testDetail.tasks);
+    }, 0);
+  }
   private viewTestDetailsByTest() {
     this.apiService.getTestDetailsByTest('TestDetail', this.currentTest.test_id).subscribe((result: TestDetail[]) => {
       if (result['response'] === 'no records') {
@@ -205,6 +221,7 @@ export class TestDetailListComponent implements OnInit {
 
       this.listTestsDetails = result;
       this.listTestsDetailsRatesSum = this.getRatesSumForCurrentTest();
+      this.listTestDetailsTotalTasks = this.getTotalTasksForCurrentTest();
       this.dataSource.data = this.listTestsDetails;
       this.dataSource.paginator = this.paginator;
     });

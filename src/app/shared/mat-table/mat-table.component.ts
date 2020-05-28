@@ -48,8 +48,7 @@ export class MatTableComponent implements OnInit, OnChanges, AfterViewInit {
     }
     this.isLoading = false;
     this.dataSource = new MatTableDataSource(this.data);
-    if (this.countRecords) {
-      // this.checkDataLength(this.data);
+    if (this.countRecords) {;
       this.matPaginator.length = this.countRecords;
       this.dataSource.sort = this.sort;
     } else {
@@ -105,23 +104,6 @@ export class MatTableComponent implements OnInit, OnChanges, AfterViewInit {
       route ? { type,  body: obj, route } : { type, body: obj }
     );
 
-  }
-
-  getRange(callback) {
-    setTimeout(() => this.isLoading = true);
-    this.apiService.getRecordsRange(this.entity, this.pageSize, this.pageIndex * this.pageSize)
-      .subscribe(data => {
-        callback(data);
-        this.isLoading = false;
-      });
-  }
-  getCountRecords(callback) {
-    this.apiService.getCountRecords(this.entity)
-      .subscribe(callback);
-  }
-  getEntity(callback) {
-    this.apiService.getEntity(this.entity)
-      .subscribe(data => callback(data));
   }
 
 }

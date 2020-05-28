@@ -2,7 +2,8 @@
 @import "~ng-pick-datetime/assets/style/picker.min.css";
 @import "~@angular/material/theming";
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
-
+@import "~codemirror/lib/codemirror";
+@import "~codemirror/theme/material-palenight";
 html,
 body {
   height: 100%;

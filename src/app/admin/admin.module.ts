@@ -69,6 +69,7 @@ import { SubjectResolver } from './subjects/subjects.resolver';
 import { TestEffects } from './store/tests/tests-effects';
 import { TestsResolver } from './tests/test.resolver';
 import { AppState } from '../reducers';
+import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 
 
 
@@ -245,7 +246,8 @@ const routes: Routes = [
     }),
     ChartsModule,
     StoreModule.forFeature('admin', reducers, { initialState: initialAdminState, metaReducers: []}),
-    EffectsModule.forFeature([FacultyEffects, SpecialityEffects, GroupEffects, StudentEffects, SubjectEffects, TestEffects])
+    EffectsModule.forFeature([FacultyEffects, SpecialityEffects, GroupEffects, StudentEffects, SubjectEffects, TestEffects]),
+    CodemirrorModule,
   ],
   providers: [
     AdminUserService,
