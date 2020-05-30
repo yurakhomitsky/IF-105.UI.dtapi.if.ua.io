@@ -134,3 +134,17 @@ export interface ScoreCalculate {
   question_length: number;
   maxMark: number;
 }
+
+export interface SlotDataResponse {
+  response: string;
+}
+
+export interface SlotData {
+  testID: number;
+  addedQuestionAnswer: Array<any>;
+}
+
+export interface AddedQuestionAnswer {
+  question: string;
+  answer: string | Array<any>;
+}

@@ -1,16 +1,16 @@
-import { Injectable, OnDestroy } from '@angular/core';
-import { Speciality, Faculty, Group } from '../../shared/entity.interface';
-import { ApiService } from 'src/app/shared/services/api.service';
-import { ModalService } from '../../shared/services/modal.service';
-import { Observable, of, concat, merge, forkJoin, combineLatest } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { select, Store } from '@ngrx/store';
+import { combineLatest, Observable, of } from 'rxjs';
+import { concatMap, filter, first, map, switchMap, tap } from 'rxjs/operators';
 import { AppState } from 'src/app/reducers';
-import { Store, select } from '@ngrx/store';
-import { selectAllFaculties, areFacultiesLoaded } from '../store/faculty/faculty-selectors';
-import { selectAllSpecialities, areSpecialitiesLoaded } from '../store/speciality/speciality-selectors';
-import { filter, map, tap, switchMap, share, first, withLatestFrom, distinctUntilChanged, concatMap, take } from 'rxjs/operators';
+import { ApiService } from 'src/app/shared/services/api.service';
+import { Faculty, Group, Speciality } from '../../shared/entity.interface';
+import { ModalService } from '../../shared/services/modal.service';
 import { loadAllFaculties } from '../store/faculty/faculty-actions';
+import { areFacultiesLoaded, selectAllFaculties } from '../store/faculty/faculty-selectors';
+import { readyGroup, selectLoadingGroups } from '../store/group/group-selectors';
 import { loadAllSpecialities } from '../store/speciality/speciality-actions';
-import { readyGroup, selectAllGroups, selectLoadingGroups } from '../store/group/group-selectors';
+import { areSpecialitiesLoaded, selectAllSpecialities } from '../store/speciality/speciality-selectors';
 
 @Injectable({
   providedIn: 'root'

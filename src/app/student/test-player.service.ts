@@ -1,8 +1,9 @@
-import {Injectable, Input} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { switchMap, map, catchError } from 'rxjs/operators';
-import { forkJoin, of, throwError } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { forkJoin, Observable, of } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 import { AuthService } from '../shared/auth.service';
+import { SlotData } from '../shared/entity.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,22 @@ export class TestPlayerService {
     return this.http.get(`testDetail/getTestDetailsByTest/${testId}`);
   }
 
+  saveData(data: SlotData) {
+    return this.http.post('TestPlayer/saveData', data);
+  }
+  getData(): Observable<any> {
+    return this.http.get<any>('TestPlayer/getData');
+  }
+  saveEndTime(endTime: any): Observable<any> {
+    return this.http.post('TestPlayer/saveEndTime', endTime);
+  }
+  getEndTime(): Observable<any> {
+    return this.http.get('TestPlayer/getEndTime');
+  }
+  getTest() {
+    return this.http.get('TestPlayer/getTest/210');
+  }
+
   maxMarkForTheTest(testId: number) {
     return this.http.get(`testDetail/getTestRate/${testId}`);
   }
@@ -29,12 +46,12 @@ export class TestPlayerService {
     return this.authservice.getCurrentUser()
       .pipe(
         switchMap(user =>
-           this.http.get(`Log/startTest/${user.id}/${testId}`)
+          this.http.get(`Log/startTest/${user.id}/${testId}`)
         )
       )
   }
   getQuestions(questionIds: any) {
-    return this.http.post('EntityManager/getEntityValues', {entity: 'Question', ids: questionIds });
+    return this.http.post('EntityManager/getEntityValues', { entity: 'Question', ids: questionIds });
   }
   getAnswer(questionId: any) {
     return this.http.get(`SAnswer/getAnswersByQuestion/${questionId}`);
@@ -50,13 +67,13 @@ export class TestPlayerService {
         return forkJoin(questionsByLevel$);
       }),
       switchMap((qwestionsByLevel: any) => {
-        const questionIds = qwestionsByLevel.flat().map(({question_id}) => question_id);
+        const questionIds = qwestionsByLevel.flat().map(({ question_id }) => question_id);
         return this.getQuestions(questionIds);
       }),
       switchMap((questions: any) => {
         const answers$ = questions
           .filter(question => question.type < 3)
-          .map(({question_id}) => this.getAnswer(question_id));
+          .map(({ question_id }) => this.getAnswer(question_id));
         return forkJoin([of(questions), forkJoin(answers$)]);
       }),
       map(([questions, answers]) => {
@@ -88,8 +105,8 @@ export class TestPlayerService {
       return [];
     }
     for (let i = answers.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [answers[i], answers[j]] = [answers[j], answers[i]];
+      const j = Math.floor(Math.random() * (i + 1));
+      [answers[i], answers[j]] = [answers[j], answers[i]];
     }
     return answers;
   }
