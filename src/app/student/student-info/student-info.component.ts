@@ -1,24 +1,18 @@
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { ApiService } from '../../shared/services/api.service';
-import { StudentInfo, TestsForStudent } from '../../shared/entity.interface';
-import { Router } from '@angular/router';
-import { Test } from '../../admin/entity.interface';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
-import { ModalService } from '../../shared/services/modal.service';
+import { Router } from '@angular/router';
+import { select, Store } from '@ngrx/store';
 import { SessionStorageService } from 'angular-web-storage';
-import { StudentInfoService } from '../student-info.service';
-import { defaultImage } from '../../shared/default-image/default-image';
-import { TestPlayerService } from '../test-player.service';
-import { ErrorResponse } from '../student.errors.response';
-import { Store, select } from '@ngrx/store';
-import { StudentState } from '../store/mainReducer';
-import { loadTimeTable } from '../store/studentTimeTable/studentTimeTable.actions';
-import { find, filter, tap, takeUntil } from 'rxjs/operators';
-import { selectTimeTableAndUserInfo, areTimeTableLoaded } from '../store/studentTimeTable/studentTimeTable.selectors';
-import { areDataLoaded } from 'src/app/admin/store/store-operators';
-import { UnSubscribeService } from 'src/app/shared/services/unsubsrice.service';
 import { Observable } from 'rxjs';
+import { filter, takeUntil } from 'rxjs/operators';
+import { UnSubscribeService } from 'src/app/shared/services/unsubsrice.service';
+import { StudentInfo, TestsForStudent } from '../../shared/entity.interface';
+import { ModalService } from '../../shared/services/modal.service';
+import { StudentState } from '../store/mainReducer';
+import { selectTimeTableAndUserInfo } from '../store/studentTimeTable/studentTimeTable.selectors';
+import { ErrorResponse } from '../student.errors.response';
+import { TestPlayerService } from '../test-player.service';
 
 @Component({
   selector: 'app-student-info',
@@ -49,8 +43,7 @@ export class StudentInfoComponent implements OnInit, OnDestroy {
     private testPlayerService: TestPlayerService,
     private store: Store<StudentState>,
     private unSubscribeService: UnSubscribeService
-  ) {
-  }
+  ) { }
 
   studentInfo: StudentInfo;
   currDate: Date;
@@ -88,6 +81,5 @@ export class StudentInfoComponent implements OnInit, OnDestroy {
         ({ error }) => {
           this.modalService.openAlertModal(ErrorResponse[error.response], 'Помилка', 'info');
         })
-   }
-
+  }
 }

@@ -27,6 +27,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatListModule } from '@angular/material/list';
 import { FormsModule } from '@angular/forms';
 import { TestPlayerResolver } from './test-player/test-player.resolver';
+import { ExitTestPlayerGuard } from '../guards/test-player.guard';
 
 const routes: Routes = [
   {
@@ -35,7 +36,8 @@ const routes: Routes = [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', component: StudentInfoComponent,  resolve: { studentInfo: StudentInfoResolver}},
       { path: 'profile', component: StudentProfileComponent,  resolve: { studentInfo: StudentInfoResolver} },
-      { path: 'test-player', component: TestPlayerComponent, resolve: { questionsList: TestPlayerResolver } },
+      { path: 'test-player', component: TestPlayerComponent, resolve: { questionsList: TestPlayerResolver }, 
+      canDeactivate: [ExitTestPlayerGuard] },
     ],
   }
 ];
@@ -74,6 +76,7 @@ const routes: Routes = [
   providers: [
     TestPlayerService,
     StudentInfoService,
+    ExitTestPlayerGuard
   ]
 })
 export class StudentModule { }
