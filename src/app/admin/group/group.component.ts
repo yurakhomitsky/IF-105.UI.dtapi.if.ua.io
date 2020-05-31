@@ -1,26 +1,26 @@
-import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
-import { Group, Speciality, Faculty } from '../../shared/entity.interface';
-import { MatTableDataSource, MatTable } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ModalService } from '../../shared/services/modal.service';
-import { ApiService } from 'src/app/shared/services/api.service';
-import { GroupModalService } from './group-modal.service';
-import { DialogData } from './group-modal.interface';
-import { GroupService } from './group.service';
-import { GroupAddEditDialogComponent } from './group-add-edit-dialog/group-add-edit-dialog.component';
-import { GroupViewDialogComponent } from './group-view-dialog/group-view-dialog.component';
-import { throwError, Observable, ReplaySubject, combineLatest, Subject, } from 'rxjs';
-import { Column, tableActionsType, ActionTable, PaginationEvent } from 'src/app/shared/mat-table/mat-table.interface';
+import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
-import { Store, select, } from '@ngrx/store';
-import { AdminState } from '../store/MainReducer';
-import { loadGroups, groupUpdate, groupDelete, groupCreate } from '../store/group/group-actions';
-import { selectTotalGroups, } from '../store/group/group-selectors';
+import { select, Store } from '@ngrx/store';
+import { combineLatest, Observable, Subject, throwError } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { selectAllSpecialities } from '../store/speciality/speciality-selectors';
+import { ActionTable, Column, PaginationEvent, tableActionsType } from 'src/app/shared/mat-table/mat-table.interface';
+import { ApiService } from 'src/app/shared/services/api.service';
+import { Faculty, Group, Speciality } from '../../shared/entity.interface';
+import { ModalService } from '../../shared/services/modal.service';
 import { selectAllFaculties } from '../store/faculty/faculty-selectors';
+import { groupCreate, groupDelete, groupUpdate, loadGroups } from '../store/group/group-actions';
+import { selectTotalGroups } from '../store/group/group-selectors';
+import { AdminState } from '../store/MainReducer';
+import { selectAllSpecialities } from '../store/speciality/speciality-selectors';
+import { GroupAddEditDialogComponent } from './group-add-edit-dialog/group-add-edit-dialog.component';
+import { DialogData } from './group-modal.interface';
+import { GroupModalService } from './group-modal.service';
+import { GroupViewDialogComponent } from './group-view-dialog/group-view-dialog.component';
+import { GroupService } from './group.service';
 
 
 
