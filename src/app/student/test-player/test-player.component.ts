@@ -98,7 +98,7 @@ export class TestPlayerComponent implements OnInit, OnDestroy, CanDeactivate<Tes
 
     this.testInProgress = setInterval(() => {
       this.synchronizeTime();
-    }, 10000);
+    }, 60000);
   }
   checkData() {
     return (source: Observable<ParamMap>) => {
