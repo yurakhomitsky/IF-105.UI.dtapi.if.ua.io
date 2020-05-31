@@ -48,6 +48,7 @@ a {
 .title-box {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
   h3 {
       padding: 15px;
   }
@@ -55,7 +56,11 @@ a {
     margin: 10px;
   }
 }
-
+@media screen and (max-width: 400px) {
+  .title-box {
+    justify-content: center;
+  }
+}
 .cdk-column-question_text {
   width: 50%;
   padding-right: 50px;

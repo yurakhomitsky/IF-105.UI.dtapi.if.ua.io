@@ -7,9 +7,17 @@ body {
   display: flex;
   justify-content: space-between;
   margin: 10px 20px;
+  flex-wrap: wrap;
   align-items: center;
 }
-
+@media screen and (max-width: 400px) {
+  .header {
+    justify-content: center;
+  }
+}
+button {
+  margin: 10px;
+}
 .subject-input {
   margin: 10px 20px;
 }

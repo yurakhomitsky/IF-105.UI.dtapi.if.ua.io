@@ -11,12 +11,17 @@ body {
 .header {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
   margin: 10px 20px;
   align-items: center;
 }
-
+@media screen and (max-width: 400px) {
+  .header {
+    justify-content: center;
+  }
+}
 button {
-  margin-left: 5px;
+  margin: 10px;
 }
 
 table {
