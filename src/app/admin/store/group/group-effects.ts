@@ -17,7 +17,7 @@ export class GroupEffects {
                 ofType(GroupAction.loadGroups),
                 concatMap((action) => {
                    return  this.groupService.getListGroup(action.pageSize,action.offset).pipe(
-                        map(data =>GroupAction.groupsLoaded({ groups: data })),
+                        map(data =>GroupAction.groupsLoaded({ groups: data.response? [] : data })),
                         catchError(() => EMPTY)
                         )}
                     ),
